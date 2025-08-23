@@ -2,11 +2,19 @@ package rs.ftn.aplikacija.entity.klase;
 
 import jakarta.persistence.*;
 import rs.ftn.aplikacija.entity.klase.enums.Tip;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 @Entity
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Kategorija {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +36,7 @@ public class Kategorija {
 
 
 
-    public Kategorija(String naziv, Tip tip, boolean predefinisan,Korisnik korisnik) {
+     public Kategorija(String naziv, Tip tip, boolean predefinisan,Korisnik korisnik) {
             this.naziv = naziv;
             this.tip = tip;
             this.predefinisan = predefinisan;
@@ -36,7 +44,7 @@ public class Kategorija {
 
     }
 
-    public Kategorija() {
+    /*public Kategorija() {
 
     }
 
@@ -70,5 +78,5 @@ public class Kategorija {
 
     public void setKorisnik(Korisnik korisnik) {
         this.korisnik = korisnik;
-    }
+    }*/
 }

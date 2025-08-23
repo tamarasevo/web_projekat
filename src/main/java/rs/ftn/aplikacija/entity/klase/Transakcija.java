@@ -2,13 +2,20 @@ package rs.ftn.aplikacija.entity.klase;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import rs.ftn.aplikacija.entity.klase.enums.Tip;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.LocalDate;
 
+@Getter
 @Entity
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Transakcija {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,10 +24,8 @@ public class Transakcija {
     private String naziv;
     private BigDecimal iznos;
     private Tip tip;
-    //DATUM STAVITI
+    private LocalDate datumTransakcije;
     private boolean ponavljajuca;
-
-    //DODATI KONSTURKOTR
 
 
     //MORAMO ZA SVE KLASE IMATI SUPROTNU POVEZANOST @OneToMany
@@ -37,8 +42,16 @@ public class Transakcija {
     @ManyToOne
     private Korisnik korisnik;
 
+    public Transakcija(String naziv, BigDecimal iznos, Tip tip,boolean ponavljajuca,LocalDate datumTransakcije) {
+        this.naziv = naziv;
+        this.iznos = iznos;
+        this.tip = tip;
+        this.datumTransakcije = LocalDate.now();
+        this.ponavljajuca = ponavljajuca;
+    }
+
     //GETERI I SETERI
-    public String getNaziv() {
+/*    public String getNaziv() {
         return naziv;
     }
 
@@ -92,5 +105,5 @@ public class Transakcija {
 
     public void setKorisnik(Korisnik korisnik) {
         this.korisnik = korisnik;
-    }
+    }*/
 }

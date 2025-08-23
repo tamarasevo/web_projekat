@@ -1,14 +1,21 @@
 package rs.ftn.aplikacija.entity.klase;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import rs.ftn.aplikacija.entity.klase.enums.Uloga;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 @Entity
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Korisnik {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,7 +53,7 @@ public class Korisnik {
 
 
 
-    public Korisnik(String ime, String prezime, String korisnickoIme, String mejl, String lozinkaHash,
+     public Korisnik(String ime, String prezime, String korisnickoIme, String mejl, String lozinkaHash,
                     LocalDate datumRodjenja, Uloga uloga, String profilnaSlika, Valuta valuta,
                     LocalDate datumRegistracije, boolean blokiran) {
         this.ime = ime;
@@ -58,15 +65,11 @@ public class Korisnik {
         this.uloga = uloga;
         this.profilnaSlika = profilnaSlika;
         this.valuta = valuta;
-        this.datumRegistracije = datumRegistracije;
+        this.datumRegistracije = LocalDate.now();
         this.blokiran = blokiran;
     }
 
-    public Korisnik() {
-
-    }
-
-    public String getIme() {
+  /*  public String getIme() {
 
         return ime;
     }
@@ -149,5 +152,5 @@ public class Korisnik {
 
     public void setBlokiran(boolean blokiran) {
         this.blokiran = blokiran;
-    }
+    }*/
 }
