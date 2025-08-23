@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter//vidi sta ces sa ovom antonacijom
 @Entity
 public class Korisnik {
     @Id
