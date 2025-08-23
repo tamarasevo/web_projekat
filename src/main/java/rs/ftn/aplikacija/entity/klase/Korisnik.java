@@ -1,22 +1,53 @@
 package rs.ftn.aplikacija.entity.klase;
 
-import java.time.LocalDate;
+import jakarta.persistence.*;
+import lombok.Getter;
+import rs.ftn.aplikacija.entity.klase.enums.Uloga;
 
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
 public class Korisnik {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String ime;
     private String prezime;
     private String korisnickoIme; // jedinstveno
     private String mejl;          // jedinstveno
     private String lozinkaHash;   // heširana lozinka
     private LocalDate datumRodjenja;
-    private String uloga;         // "Korisnik" ili "Administrator"
+    private Uloga uloga;         // "Korisnik" ili "Administrator"
     private String profilnaSlika; // putanja do slike
-    private Valuta valuta;        // podrazumevana valuta
     private LocalDate datumRegistracije;
     private boolean blokiran;
 
+
+    //da li nam je uopste potrebna valuta ako se ona
+    //vec nalazi u novcaniku
+    //nije potrebna ali uz ovu antonaciju nema konflikta
+    @ManyToOne
+    private Valuta valuta;        // podrazumevana valuta
+
+
+    //Kornisnik moze da ima vise novcanika i pravimo set novcanika
+    @OneToMany(mappedBy="korisnik")
+    private Set<Novcanik> novcanici= new HashSet<>();
+
+    @OneToMany(mappedBy="korisnik")
+    private Set<Transakcija> transakcije=new HashSet<>();
+
+    @OneToMany(mappedBy="korisnik")
+    private Set<Kategorija> kategorija=new HashSet<>();
+
+
+
+
     public Korisnik(String ime, String prezime, String korisnickoIme, String mejl, String lozinkaHash,
-                    LocalDate datumRodjenja, String uloga, String profilnaSlika, Valuta valuta,
+                    LocalDate datumRodjenja, Uloga uloga, String profilnaSlika, Valuta valuta,
                     LocalDate datumRegistracije, boolean blokiran) {
         this.ime = ime;
         this.prezime = prezime;
@@ -31,16 +62,17 @@ public class Korisnik {
         this.blokiran = blokiran;
     }
 
+    public Korisnik() {
+
+    }
+
     public String getIme() {
+
         return ime;
     }
 
     public String getPrezime() {
         return prezime;
-    }
-
-    public String getKorisnickoIme() {
-        return korisnickoIme;
     }
 
     public String getMejl() {
@@ -55,7 +87,7 @@ public class Korisnik {
         return datumRodjenja;
     }
 
-    public String getUloga() {
+    public Uloga getUloga() {
         return uloga;
     }
 
@@ -99,7 +131,7 @@ public class Korisnik {
         this.datumRodjenja = datumRodjenja;
     }
 
-    public void setUloga(String uloga) {
+    public void setUloga(Uloga uloga) {
         this.uloga = uloga;
     }
 

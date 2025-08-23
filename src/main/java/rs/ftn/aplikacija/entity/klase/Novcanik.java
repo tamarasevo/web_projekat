@@ -1,16 +1,35 @@
 package rs.ftn.aplikacija.entity.klase;
 
-import java.time.LocalDate;
+import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
 public class Novcanik {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String naziv;
     private double pocetnoStanje;
     private double trenutnoStanje;
-    private Valuta valuta;
     private LocalDate datumKreiranja;
-    private Korisnik korisnik;
     private boolean stedni;
     private boolean arhiviran;
+
+    //veza, jedna valuta moze biti u vise novcanika
+    @ManyToOne
+    private Valuta valuta;
+
+    //jedan korisnik moze imati vise novcanika
+    @ManyToOne
+    private Korisnik korisnik;
+
+    @OneToMany(mappedBy="novcanik")
+    private Set<Transakcija> transakcije=new HashSet<>();
+
 
     public Novcanik(String naziv, double pocetnoStanje, Valuta valuta, LocalDate datumKreiranja,
                     Korisnik korisnik, boolean stedni, boolean arhiviran) {
@@ -22,6 +41,10 @@ public class Novcanik {
         this.korisnik = korisnik;
         this.stedni = stedni;
         this.arhiviran = arhiviran;
+    }
+
+    public Novcanik() {
+
     }
 
     public void azurirajStanje(double iznos) {
