@@ -22,7 +22,10 @@ public class Kategorija {
 
 
     private String naziv;
+
+    @Enumerated(EnumType.STRING)
     private Tip tip;
+
     private boolean predefinisan; // da li je podrazumevana ili mora rucno od svakog korisnika
 
 

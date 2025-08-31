@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rs.ftn.aplikacija.entity.klase.enums.Tip;
+import rs.ftn.aplikacija.entity.klase.enums.Ucestalost;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,7 +26,12 @@ public class Transakcija {
     private BigDecimal iznos;
     private Tip tip;
     private LocalDate datumTransakcije;
-    private boolean ponavljajuca;
+    //po defaultu mora da bude false
+    private boolean ponavljajuca=false;
+
+    //UCESTALOST STAVICEMO KAO ENUM
+    @Enumerated(EnumType.STRING)
+    private Ucestalost ucestalost;
 
 
     //MORAMO ZA SVE KLASE IMATI SUPROTNU POVEZANOST @OneToMany
@@ -42,12 +48,13 @@ public class Transakcija {
     @ManyToOne
     private Korisnik korisnik;
 
-    public Transakcija(String naziv, BigDecimal iznos, Tip tip,boolean ponavljajuca,LocalDate datumTransakcije) {
+    public Transakcija(String naziv, BigDecimal iznos, Tip tip,boolean ponavljajuca,LocalDate datumTransakcije,Ucestalost ucestalost) {
         this.naziv = naziv;
         this.iznos = iznos;
         this.tip = tip;
         this.datumTransakcije = LocalDate.now();
         this.ponavljajuca = ponavljajuca;
+        this.ucestalost = ucestalost;
     }
 
     //GETERI I SETERI

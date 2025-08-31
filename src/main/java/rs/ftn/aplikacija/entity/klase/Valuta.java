@@ -30,7 +30,6 @@ public class Valuta {
    public Valuta(String naziv, double vrednost) {
         this.naziv = naziv;
         this.vrednost = vrednost;
-
     }
 
   /*  public String getNaziv() {

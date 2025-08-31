@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,11 +22,12 @@ public class Novcanik {
     private Long id;
 
     private String naziv;
-    private double pocetnoStanje;
-    private double trenutnoStanje;
+    private BigDecimal pocetnoStanje;
+    private BigDecimal trenutnoStanje;
     private LocalDate datumKreiranja;
     private boolean stedni;
-    private boolean arhiviran;
+    //po defalutu mora biti false
+    private boolean arhiviran=false;
 
     //veza, jedna valuta moze biti u vise novcanika
     @ManyToOne
@@ -38,12 +40,16 @@ public class Novcanik {
     @OneToMany(mappedBy="novcanik")
     private Set<Transakcija> transakcije=new HashSet<>();
 
+    //videti da li da bude set ili lista
+    @OneToMany(mappedBy = "novcanik")
+    private Set<Goal> stednja=new HashSet<>();
 
-     public Novcanik(String naziv, double pocetnoStanje, Valuta valuta, LocalDate datumKreiranja,
+
+     public Novcanik(String naziv, BigDecimal pocetnoStanje,BigDecimal trenutnoStanje,Valuta valuta, LocalDate datumKreiranja,
                     Korisnik korisnik, boolean stedni, boolean arhiviran) {
         this.naziv = naziv;
         this.pocetnoStanje = pocetnoStanje;
-        this.trenutnoStanje = pocetnoStanje;
+        this.trenutnoStanje = trenutnoStanje;
         this.valuta = valuta;
         this.datumKreiranja = datumKreiranja;
         this.korisnik = korisnik;
