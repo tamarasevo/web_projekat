@@ -53,7 +53,7 @@ public class Korisnik {
 
 
 
-     public Korisnik(String ime, String prezime, String korisnickoIme, String mejl, String lozinkaHash,
+    public Korisnik(String ime, String prezime, String korisnickoIme, String mejl, String lozinkaHash,
                     LocalDate datumRodjenja, Uloga uloga, String profilnaSlika, Valuta valuta,
                     LocalDate datumRegistracije, boolean blokiran) {
         this.ime = ime;
@@ -65,11 +65,15 @@ public class Korisnik {
         this.uloga = uloga;
         this.profilnaSlika = profilnaSlika;
         this.valuta = valuta;
-        this.datumRegistracije = LocalDate.now();
+        this.datumRegistracije = datumRegistracije;
         this.blokiran = blokiran;
     }
 
-  /*  public String getIme() {
+  /*  public Korisnik() {
+
+    }
+
+    public String getIme() {
 
         return ime;
     }
