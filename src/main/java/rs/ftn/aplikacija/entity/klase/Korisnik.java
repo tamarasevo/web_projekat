@@ -1,15 +1,21 @@
 package rs.ftn.aplikacija.entity.klase;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import rs.ftn.aplikacija.entity.klase.enums.Uloga;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter//vidi sta ces sa ovom antonacijom
+@Getter
 @Entity
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Korisnik {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,7 +69,7 @@ public class Korisnik {
         this.blokiran = blokiran;
     }
 
-    public Korisnik() {
+   /* public Korisnik() {
 
     }
 
@@ -150,5 +156,5 @@ public class Korisnik {
 
     public void setBlokiran(boolean blokiran) {
         this.blokiran = blokiran;
-    }
+    }*/
 }

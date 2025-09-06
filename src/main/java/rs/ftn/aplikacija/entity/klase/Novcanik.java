@@ -1,12 +1,20 @@
 package rs.ftn.aplikacija.entity.klase;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 @Entity
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Novcanik {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +39,7 @@ public class Novcanik {
     private Set<Transakcija> transakcije=new HashSet<>();
 
 
-    public Novcanik(String naziv, double pocetnoStanje, Valuta valuta, LocalDate datumKreiranja,
+     public Novcanik(String naziv, double pocetnoStanje, Valuta valuta, LocalDate datumKreiranja,
                     Korisnik korisnik, boolean stedni, boolean arhiviran) {
         this.naziv = naziv;
         this.pocetnoStanje = pocetnoStanje;
@@ -43,11 +51,11 @@ public class Novcanik {
         this.arhiviran = arhiviran;
     }
 
-    public Novcanik() {
+ /*   public Novcanik() {
 
     }
 
-    public void azurirajStanje(double iznos) {
+   public void azurirajStanje(double iznos) {
         this.trenutnoStanje += iznos;
     }
 
@@ -113,5 +121,5 @@ public class Novcanik {
 
     public void setArhiviran(boolean arhiviran) {
         this.arhiviran = arhiviran;
-    }
+    }*/
 }
