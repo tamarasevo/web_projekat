@@ -47,39 +47,4 @@ public class Kategorija {
 
     }
 
-    /*public Kategorija() {
-
-    }
-
-    public String getNaziv() {
-        return naziv;
-    }
-
-    public void setNaziv(String naziv) {
-        this.naziv = naziv;
-    }
-
-    public Tip getTip() {
-        return tip;
-    }
-
-    public void setTip(Tip tip) {
-        this.tip = tip;
-    }
-
-    public boolean isPredefinisan() {
-        return predefinisan;
-    }
-
-    public void setPredefinisan(boolean predefinisan) {
-        this.predefinisan = predefinisan;
-    }
-
-    public Korisnik getKorisnik() {
-        return korisnik;
-    }
-
-    public void setKorisnik(Korisnik korisnik) {
-        this.korisnik = korisnik;
-    }*/
 }

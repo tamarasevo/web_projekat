@@ -63,5 +63,10 @@ public class NovcanikService {
         return novcanik.getTrenutnoStanje();
     }
 
+    //opcija da se napravi novcanik za stednju
+
+
+    //DODATI TRANSAKCIJE IZMEDJU NOVCANIKA KAKO BI MOGLI DA IMPLEMTIRAMO
+    //2.5 DO KRAJA
 
 }

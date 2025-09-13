@@ -24,6 +24,7 @@ public class Transakcija {
 
     private String naziv;
     private BigDecimal iznos;
+    @Enumerated(EnumType.STRING)
     private Tip tip;
     private LocalDate datumTransakcije;
     //po defaultu mora da bude false
@@ -44,6 +45,7 @@ public class Transakcija {
     @ManyToOne
     private Novcanik novcanik;
 
+    //razmisliti da li ukloniti
     //1 transakcija 1 korisnik, ali 1 korisnik moze imati vise transakcija
     @ManyToOne
     private Korisnik korisnik;
@@ -57,60 +59,5 @@ public class Transakcija {
         this.ucestalost = ucestalost;
     }
 
-    //GETERI I SETERI
-/*    public String getNaziv() {
-        return naziv;
-    }
 
-    public void setNaziv(String naziv) {
-        this.naziv = naziv;
-    }
-
-    public BigDecimal getIznos() {
-        return iznos;
-    }
-
-    public void setIznos(BigDecimal iznos) {
-        this.iznos = iznos;
-    }
-
-    public Tip getTip() {
-        return tip;
-    }
-
-    public void setTip(Tip tip) {
-        this.tip = tip;
-    }
-
-    public boolean isPonavljajuca() {
-        return ponavljajuca;
-    }
-
-    public void setPonavljajuca(boolean ponavljajuca) {
-        this.ponavljajuca = ponavljajuca;
-    }
-
-    public Kategorija getKategorije() {
-        return kategorije;
-    }
-
-    public void setKategorije(Kategorija kategorije) {
-        this.kategorije = kategorije;
-    }
-
-    public Novcanik getNovcanik() {
-        return novcanik;
-    }
-
-    public void setNovcanik(Novcanik novcanik) {
-        this.novcanik = novcanik;
-    }
-
-    public Korisnik getKorisnik() {
-        return korisnik;
-    }
-
-    public void setKorisnik(Korisnik korisnik) {
-        this.korisnik = korisnik;
-    }*/
 }

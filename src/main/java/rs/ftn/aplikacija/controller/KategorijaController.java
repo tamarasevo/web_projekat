@@ -27,7 +27,7 @@ public class KategorijaController {
     }
 
     //pregled sopstvenih kategorija
-    @GetMapping("/korisnik/{korisnikId}/sopstvene}")
+    @GetMapping("/korisnik/{korisnikId}/sopstvene")
     public ResponseEntity<List<Kategorija>>pregledSopstvenihKategorija(@PathVariable Long korisnikId){
         List<Kategorija> sopstveneKategorije=kategorijaService.pregledSopstvenihKategorija(korisnikId);
         return ResponseEntity.ok(sopstveneKategorije);

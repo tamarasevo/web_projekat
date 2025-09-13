@@ -1,5 +1,6 @@
 package rs.ftn.aplikacija.entity.klase;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -45,6 +46,7 @@ public class Korisnik {
 
     //Kornisnik moze da ima vise novcanika i pravimo set novcanika
     @OneToMany(mappedBy="korisnik")
+    @JsonManagedReference
     private Set<Novcanik> novcanici= new HashSet<>();
 
     @OneToMany(mappedBy="korisnik")
@@ -75,92 +77,5 @@ public class Korisnik {
         this.blokiran = blokiran;
     }
 
-   /* public Korisnik() {
 
-    }
-
-    public String getIme() {
-
-        return ime;
-    }
-
-    public String getPrezime() {
-        return prezime;
-    }
-
-    public String getMejl() {
-        return mejl;
-    }
-
-    public String getLozinkaHash() {
-        return lozinkaHash;
-    }
-
-    public LocalDate getDatumRodjenja() {
-        return datumRodjenja;
-    }
-
-    public Uloga getUloga() {
-        return uloga;
-    }
-
-    public String getProfilnaSlika() {
-        return profilnaSlika;
-    }
-
-    public Valuta getValuta() {
-        return valuta;
-    }
-
-    public LocalDate getDatumRegistracije() {
-        return datumRegistracije;
-    }
-
-    public boolean isBlokiran() {
-        return blokiran;
-    }
-
-    public void setIme(String ime) {
-        this.ime = ime;
-    }
-
-    public void setPrezime(String prezime) {
-        this.prezime = prezime;
-    }
-
-    public void setKorisnickoIme(String korisnickoIme) {
-        this.korisnickoIme = korisnickoIme;
-    }
-
-    public void setMejl(String mejl) {
-        this.mejl = mejl;
-    }
-
-    public void setLozinkaHash(String lozinkaHash) {
-        this.lozinkaHash = lozinkaHash;
-    }
-
-    public void setDatumRodjenja(LocalDate datumRodjenja) {
-        this.datumRodjenja = datumRodjenja;
-    }
-
-    public void setUloga(Uloga uloga) {
-        this.uloga = uloga;
-    }
-
-    public void setProfilnaSlika(String profilnaSlika) {
-        this.profilnaSlika = profilnaSlika;
-    }
-
-    public void setValuta(Valuta valuta) {
-        this.valuta = valuta;
-    }
-
-    public void setDatumRegistracije(LocalDate datumRegistracije) {
-        this.datumRegistracije = datumRegistracije;
-    }
-
-    public void setBlokiran(boolean blokiran) {
-        this.blokiran = blokiran;
-    }*/
 }

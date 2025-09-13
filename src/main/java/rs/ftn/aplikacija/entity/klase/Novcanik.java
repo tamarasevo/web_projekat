@@ -1,5 +1,7 @@
 package rs.ftn.aplikacija.entity.klase;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,9 +37,10 @@ public class Novcanik {
 
     //jedan korisnik moze imati vise novcanika
     @ManyToOne
+    @JsonBackReference
     private Korisnik korisnik;
 
-    @OneToMany(mappedBy="novcanik")
+    @OneToMany(mappedBy="novcanik", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Transakcija> transakcije=new HashSet<>();
 
     //videti da li da bude set ili lista
@@ -57,75 +60,5 @@ public class Novcanik {
         this.arhiviran = arhiviran;
     }
 
- /*   public Novcanik() {
 
-    }
-
-   public void azurirajStanje(double iznos) {
-        this.trenutnoStanje += iznos;
-    }
-
-    public String getNaziv() {
-        return naziv;
-    }
-
-    public double getPocetnoStanje() {
-        return pocetnoStanje;
-    }
-
-    public double getTrenutnoStanje() {
-        return trenutnoStanje;
-    }
-
-    public Valuta getValuta() {
-        return valuta;
-    }
-
-    public LocalDate getDatumKreiranja() {
-        return datumKreiranja;
-    }
-
-    public Korisnik getKorisnik() {
-        return korisnik;
-    }
-
-    public boolean isStedni() {
-        return stedni;
-    }
-
-    public boolean isArhiviran() {
-        return arhiviran;
-    }
-
-    public void setNaziv(String naziv) {
-        this.naziv = naziv;
-    }
-
-    public void setPocetnoStanje(double pocetnoStanje) {
-        this.pocetnoStanje = pocetnoStanje;
-    }
-
-    public void setTrenutnoStanje(double trenutnoStanje) {
-        this.trenutnoStanje = trenutnoStanje;
-    }
-
-    public void setValuta(Valuta valuta) {
-        this.valuta = valuta;
-    }
-
-    public void setDatumKreiranja(LocalDate datumKreiranja) {
-        this.datumKreiranja = datumKreiranja;
-    }
-
-    public void setKorisnik(Korisnik korisnik) {
-        this.korisnik = korisnik;
-    }
-
-    public void setStedni(boolean stedni) {
-        this.stedni = stedni;
-    }
-
-    public void setArhiviran(boolean arhiviran) {
-        this.arhiviran = arhiviran;
-    }*/
 }

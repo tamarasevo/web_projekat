@@ -6,14 +6,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.ftn.aplikacija.entity.klase.Novcanik;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
+import rs.ftn.aplikacija.entity.klase.enums.Tip;
 import rs.ftn.aplikacija.entity.klase.enums.Ucestalost;
 import rs.ftn.aplikacija.service.NovcanikService;
 import rs.ftn.aplikacija.service.TransakcijaService;
+
+import java.math.BigDecimal;
 
 //rest kontorler nam treba jer ce nam on vratiti podatke
 //koje cemo koristiti u frontendu
 //a kontroler bi nam vratio HTML stranicu
 @RestController
+@RequestMapping("/api/transakcije")
 public class TransakcijaController {
 
     private final NovcanikService novcanikService;
@@ -25,7 +29,7 @@ public class TransakcijaController {
     }
 
     //dodaj transakciju(iznos,tip,datum,kategorija)
-    @PostMapping("/dodaj")
+    @PostMapping("{novcanikId}/dodaj")
     public ResponseEntity<Transakcija> dodajTransakcija(@RequestBody Transakcija transakcija,@PathVariable Long novcanikId){
 
         //prvo nadjemo novcanik kome pripada tarnsakcija
@@ -43,11 +47,14 @@ public class TransakcijaController {
 
         //cuvamo transakciju
         Transakcija sacuvana=transakcijaService.save(transakcija);
+        System.out.println("Pre update-a: " + novcanik.getTrenutnoStanje());
+        if(sacuvana.getTip()== Tip.PRIHOD){
+            novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().add(sacuvana.getIznos()));
+        }else if(sacuvana.getTip()==Tip.TROSAK) {
+            novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().subtract(sacuvana.getIznos()));
+        }
 
-        if(transakcija.getTip().equals("PRIHOD")){
-            novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().add(transakcija.getIznos()));
-        }else
-            novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().subtract(transakcija.getIznos()));
+        System.out.println("Tip transakcije: " + sacuvana.getTip());
 
         //update novcanik
         novcanikService.save(novcanik);
@@ -77,6 +84,17 @@ public class TransakcijaController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(uspesno);
+    }
+
+    //transfer izmedju dva novcanika
+    @PostMapping("/transfer")
+    public ResponseEntity<String> transfer(@RequestParam Long izNovcanika, @RequestParam Long uNovcanik, @RequestParam BigDecimal iznos){
+        try {
+            transakcijaService.transferIzmedjuNovcanika(izNovcanika, uNovcanik, iznos);
+            return ResponseEntity.ok("Transfer uspešno izvršen");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 

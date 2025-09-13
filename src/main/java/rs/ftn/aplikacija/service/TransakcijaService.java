@@ -1,12 +1,18 @@
 package rs.ftn.aplikacija.service;
 
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import rs.ftn.aplikacija.entity.klase.Novcanik;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
+import rs.ftn.aplikacija.entity.klase.enums.Tip;
 import rs.ftn.aplikacija.entity.klase.enums.Ucestalost;
 import rs.ftn.aplikacija.repository.TransakcijaRepository;
+import rs.ftn.aplikacija.entity.klase.Transfer;
 
+import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,6 +20,11 @@ import java.util.List;
 public class TransakcijaService {
 
     private final TransakcijaRepository transakcijaRepository;
+    @Autowired
+    private NovcanikService novcanikService;
+    @Autowired
+    private ValutaService valutaService;
+
     public TransakcijaService(TransakcijaRepository transakcijaRepository) {
         this.transakcijaRepository = transakcijaRepository;
     }
@@ -98,8 +109,55 @@ public class TransakcijaService {
             }
 
         }
-
-
     }
+    //obezbedjujemo da se izvrsava u okviru jedne transakcije
+    @Transactional
+    public void transferIzmedjuNovcanika(Long izNovcanika, Long uNovcanik, BigDecimal iznos){
+        Novcanik iz=novcanikService.getById(izNovcanika);
+        Novcanik u=novcanikService.getById(uNovcanik);
+
+        if(iz.getTrenutnoStanje().compareTo(iznos)<0){
+            throw new RuntimeException("Nema dovoljno sredstava");
+        }
+
+        iz.setTrenutnoStanje(iz.getTrenutnoStanje().subtract(iznos));
+        novcanikService.save(iz);
+
+        BigDecimal iznosPrimaoca;
+        if(iz.getValuta().equals(u.getValuta())){
+            iznosPrimaoca=iznos;
+        }else{
+            iznosPrimaoca = iznos.multiply(valutaService.konvertuj(iznos,iz.getValuta().getNaziv(),u.getValuta().getNaziv()));
+        }
+
+        u.setTrenutnoStanje(u.getTrenutnoStanje().add(iznosPrimaoca));
+        novcanikService.save(u);
+
+        Transakcija t1=new Transakcija();
+        t1.setNaziv("Transfer");
+        t1.setNovcanik(iz);
+        t1.setIznos(iznos);
+        t1.setTip(Tip.TROSAK);
+        transakcijaRepository.save(t1);
+
+        Transakcija t2=new Transakcija();
+        t2.setNaziv("Transfer");
+        t2.setNovcanik(u);
+        t2.setIznos(iznosPrimaoca);
+        t2.setTip(Tip.PRIHOD);
+        transakcijaRepository.save(t1);
+    }
+
+    //za pregled transakcije, po danu
+    /*public List<Transakcija> findNovcanikAndDan(Long novcanikId,LocalDate datum){
+        return transakcijaRepository.findByNovcanikAndDatumTransakcija(novcanikId,datum);
+    }*/
+
+   /* public List<Transakcija> findByNovcanikAndNedelja(Long novcanikId,LocalDate datum){
+        LocalDate start=datum.with(DayOfWeek.MONDAY);
+        LocalDate end=datum.with(DayOfWeek.SATURDAY);
+
+    }*/
+
 
 }

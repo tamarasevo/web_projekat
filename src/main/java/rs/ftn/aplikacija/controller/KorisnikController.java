@@ -24,7 +24,7 @@ public class KorisnikController {
         return ResponseEntity.ok(broj);
     }
     @PutMapping("/profil/{korisnikId}")
-    public ResponseEntity<Korisnik> izmeniProfil(@PathVariable Long korisnikId,@RequestParam Korisnik korisnik) {
+    public ResponseEntity<Korisnik> izmeniProfil(@PathVariable Long korisnikId,@RequestBody Korisnik korisnik) {
         Korisnik izmenjen=korisnikService.izmeniKorisnika(korisnikId,korisnik);
         if(izmenjen!=null){
             return ResponseEntity.notFound().build();
@@ -38,7 +38,7 @@ public class KorisnikController {
     public ResponseEntity<Korisnik> registracija(@RequestBody Korisnik korisnik) {
         Korisnik sacuvan=korisnikService.registrujKorisnika(korisnik);
 
-        if(korisnik==null)
+        if(sacuvan==null)
             return ResponseEntity.badRequest().build();
 
         return ResponseEntity.ok(sacuvan);

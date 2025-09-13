@@ -32,21 +32,6 @@ public class Valuta {
         this.vrednost = vrednost;
     }
 
-  /*  public String getNaziv() {
-        return naziv;
-    }
-
-    public double getVrednost() {
-        return vrednost;
-    }
-
-    public void setNaziv(String naziv) {
-        this.naziv = naziv;
-    }
-
-    public void setVrednost(double vrednost) {
-        this.vrednost = vrednost;
-    }*/
 
 
 }

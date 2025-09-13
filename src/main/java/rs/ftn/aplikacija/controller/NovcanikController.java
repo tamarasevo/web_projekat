@@ -37,7 +37,7 @@ public class NovcanikController {
         Korisnik korisnik =korisnikService.getKorisnika(korisnikID);
 
         if(korisnik==null){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().build();
         }
 
         novcanik.setKorisnik(korisnik);
@@ -66,7 +66,7 @@ public class NovcanikController {
     }
 
     //Brisanje novcanika
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/obrisi/{id}")
     public ResponseEntity<Novcanik> obrisiNovcanik(@PathVariable Long id){
         Novcanik novcanik=novcanikService.getById(id);
         if(novcanik==null)
@@ -90,7 +90,7 @@ public class NovcanikController {
         return ResponseEntity.ok(transakcije);
     }
 
-    //pregled stanja
+   /* //pregled stanja
     @GetMapping("/{novcanikId}/stanje")
     public ResponseEntity<BigDecimal> pregledStanje(@PathVariable Long novcanikId){
         Novcanik novcanik=novcanikService.getById(novcanikId);
@@ -100,7 +100,7 @@ public class NovcanikController {
         BigDecimal stanje=novcanik.getTrenutnoStanje();
 
         return ResponseEntity.ok(stanje);
-    }
+    }*/
 
     //ovde samo pozivamao metodu za arhiviranje ne moze ovde menjati
     //contorller samo prima i prosledjuje zahteve servisu
