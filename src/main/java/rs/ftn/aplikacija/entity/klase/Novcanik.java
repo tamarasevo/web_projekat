@@ -43,9 +43,10 @@ public class Novcanik {
     @OneToMany(mappedBy="novcanik", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Transakcija> transakcije=new HashSet<>();
 
+    //ovo am ne treba jer imam jedan cilj po novcaniku
     //videti da li da bude set ili lista
-    @OneToMany(mappedBy = "novcanik")
-    private Set<Goal> stednja=new HashSet<>();
+   /* @OneToMany(mappedBy = "novcanik")
+    private Set<Goal> stednja=new HashSet<>();*/
 
 
      public Novcanik(String naziv, BigDecimal pocetnoStanje,BigDecimal trenutnoStanje,Valuta valuta, LocalDate datumKreiranja,

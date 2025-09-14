@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ftn.aplikacija.entity.klase.Kategorija;
 import rs.ftn.aplikacija.entity.klase.Korisnik;
+import rs.ftn.aplikacija.entity.klase.enums.Tip;
 import rs.ftn.aplikacija.repository.KategorijaRepository;
 import rs.ftn.aplikacija.repository.KorisnikRepository;
 
@@ -29,6 +30,10 @@ public class KategorijaService {
 
     public Kategorija getByKategorijaId(Long kategorijaId){
         return kategorijaRepository.findById(kategorijaId).orElse(null);
+    }
+
+    public List<Kategorija> getKategorijaPredefinise(){
+        return kategorijaRepository.findByPredefinisanTrue();
     }
 
    /* public Kategorija update(Kategorija kategorija){
@@ -66,6 +71,17 @@ public class KategorijaService {
         kategorija.setPredefinisan(false);
         return kategorijaRepository.save(kategorija);
 
+    }
+
+    //za admina dodavanje predefinisanih
+    public Kategorija dodajPredefinisanKategoriju(String naziv, Tip tip){
+        Kategorija kategorija=new Kategorija();
+        kategorija.setNaziv(naziv);
+        kategorija.setTip(tip);
+        kategorija.setPredefinisan(true);
+        //obezbedjujemo da nijedan korsnik ne moze da pravi globale promenljive
+        kategorija.setKorisnik(null);
+        return kategorijaRepository.save(kategorija);
     }
 
 }

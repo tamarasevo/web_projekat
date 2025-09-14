@@ -4,6 +4,7 @@ package rs.ftn.aplikacija.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rs.ftn.aplikacija.dto.TransakcijaDto;
 import rs.ftn.aplikacija.entity.klase.Novcanik;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
 import rs.ftn.aplikacija.entity.klase.enums.Tip;
@@ -30,7 +31,7 @@ public class TransakcijaController {
 
     //dodaj transakciju(iznos,tip,datum,kategorija)
     @PostMapping("{novcanikId}/dodaj")
-    public ResponseEntity<Transakcija> dodajTransakcija(@RequestBody Transakcija transakcija,@PathVariable Long novcanikId){
+    public ResponseEntity<Transakcija> dodajTransakcija(@RequestBody Transakcija transakcija,@PathVariable Long novcanikId) {
 
         //prvo nadjemo novcanik kome pripada tarnsakcija
         Novcanik novcanik=novcanikService.getById(novcanikId);

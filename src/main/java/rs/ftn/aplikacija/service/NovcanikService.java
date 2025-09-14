@@ -28,6 +28,10 @@ public class NovcanikService {
        novcanikRepository.delete(novcanik);
     }
 
+    public List<Novcanik> getNovcanici(Long id){
+        return novcanikRepository.findByKorisnikId(id);
+    }
+
     public Boolean arhiviraj(Long novcanikId){
         Novcanik novcanik=novcanikRepository.findById(novcanikId).orElse(null);
         if(novcanik==null)

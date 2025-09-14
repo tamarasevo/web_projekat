@@ -127,7 +127,7 @@ public class TransakcijaService {
         if(iz.getValuta().equals(u.getValuta())){
             iznosPrimaoca=iznos;
         }else{
-            iznosPrimaoca = iznos.multiply(valutaService.konvertuj(iznos,iz.getValuta().getNaziv(),u.getValuta().getNaziv()));
+            iznosPrimaoca = valutaService.konvertuj(iz.getValuta().getNaziv(),u.getValuta().getNaziv(),iznos);
         }
 
         u.setTrenutnoStanje(u.getTrenutnoStanje().add(iznosPrimaoca));
@@ -145,7 +145,7 @@ public class TransakcijaService {
         t2.setNovcanik(u);
         t2.setIznos(iznosPrimaoca);
         t2.setTip(Tip.PRIHOD);
-        transakcijaRepository.save(t1);
+        transakcijaRepository.save(t2);
     }
 
     //za pregled transakcije, po danu

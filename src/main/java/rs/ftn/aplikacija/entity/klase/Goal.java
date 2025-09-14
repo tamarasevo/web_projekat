@@ -1,15 +1,19 @@
 package rs.ftn.aplikacija.entity.klase;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
-@Setter
 @Entity
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Goal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,8 +24,9 @@ public class Goal {
     private BigDecimal trenutnoStanje;
     private LocalDate krajnjiRok;
 
-    //Vise ciljeva moze biti u jednom novcaniku
-    @ManyToOne
+    //ipak jedan cilj po novcaniku
+   // @ManyToOne
+    @OneToOne
     private Novcanik novcanik;
 
     @ManyToOne

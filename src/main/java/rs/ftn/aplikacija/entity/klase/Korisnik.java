@@ -36,12 +36,14 @@ public class Korisnik {
     private LocalDate datumRegistracije;
     private boolean blokiran;
 
+    private String valuta;
+
 
     //da li nam je uopste potrebna valuta ako se ona
     //vec nalazi u novcaniku
     //nije potrebna ali uz ovu antonaciju nema konflikta
-    @ManyToOne
-    private Valuta valuta;        // podrazumevana valuta
+   /* @ManyToOne
+    private Valuta valuta;   */     // podrazumevana valuta
 
 
     //Kornisnik moze da ima vise novcanika i pravimo set novcanika
@@ -62,7 +64,7 @@ public class Korisnik {
 
 
     public Korisnik(String ime, String prezime, String korisnickoIme, String mejl, String lozinkaHash,
-                    LocalDate datumRodjenja, Uloga uloga, String profilnaSlika, Valuta valuta,
+                    LocalDate datumRodjenja, Uloga uloga, String profilnaSlika, String valuta,
                     LocalDate datumRegistracije, boolean blokiran) {
         this.ime = ime;
         this.prezime = prezime;

@@ -2,12 +2,17 @@ package rs.ftn.aplikacija.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rs.ftn.aplikacija.dto.RegistracijaDto;
 import rs.ftn.aplikacija.entity.klase.Kategorija;
 import rs.ftn.aplikacija.entity.klase.Korisnik;
+import rs.ftn.aplikacija.entity.klase.Valuta;
 import rs.ftn.aplikacija.entity.klase.enums.Tip;
+import rs.ftn.aplikacija.entity.klase.enums.Uloga;
 import rs.ftn.aplikacija.repository.KategorijaRepository;
 import rs.ftn.aplikacija.repository.KorisnikRepository;
+import rs.ftn.aplikacija.repository.ValutaRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -17,6 +22,10 @@ public class KorisnikService {
 
     @Autowired
     private KategorijaRepository kategorijaRepository;
+    @Autowired
+    private ValutaRepository valutaRepository;
+
+
 
     public KorisnikService(KorisnikRepository korisnikRepository) {
         this.korisnikRepository = korisnikRepository;
@@ -69,8 +78,21 @@ public class KorisnikService {
     }
 
     //Registracija korisnika
-    public Korisnik registrujKorisnika(Korisnik korisnik){
-        Korisnik sacuvan=korisnikRepository.save(korisnik);
+    public Korisnik registrujKorisnika(RegistracijaDto korisnikDTO){
+
+        Korisnik korisnik = new Korisnik();
+        korisnik.setIme(korisnikDTO.getIme());
+        korisnik.setPrezime(korisnikDTO.getPrezime());
+        korisnik.setKorisnickoIme(korisnikDTO.getKorisnickoIme());
+        korisnik.setMejl(korisnikDTO.getEmail());
+        korisnik.setLozinkaHash(korisnikDTO.getLozinka());
+        korisnik.setDatumRodjenja(korisnikDTO.getDatumRodjenja());
+        korisnik.setUloga(Uloga.KORISNIK); // default uloga
+        korisnik.setValuta(korisnikDTO.getValuta());
+        korisnik.setDatumRegistracije(LocalDate.now());
+        korisnik.setBlokiran(false);
+
+        Korisnik sacuvan = korisnikRepository.save(korisnik);
         List<Kategorija> kategorijePredefinisane= List.of(
                 new Kategorija("Hrana", Tip.TROSAK,true,sacuvan),
                 new Kategorija("Domacinstvo",Tip.TROSAK,true,sacuvan),
@@ -83,5 +105,17 @@ public class KorisnikService {
         }
 
         return sacuvan;
+    }
+
+    public Korisnik login(String korisnickoIme,String lozinka){
+        Korisnik korisnik=korisnikRepository.findByKorisnickoIme(korisnickoIme);
+        if(korisnik==null){
+            throw new RuntimeException("Nepoznat korisnik.");
+        }
+
+        if(!korisnik.getLozinkaHash().equals(korisnik.getLozinkaHash())){
+            throw new RuntimeException("Lozinka nije tacna.");
+        }
+        return korisnik;
     }
 }

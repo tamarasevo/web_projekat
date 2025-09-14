@@ -2,6 +2,8 @@ package rs.ftn.aplikacija.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rs.ftn.aplikacija.dto.LoginDto;
+import rs.ftn.aplikacija.dto.RegistracijaDto;
 import rs.ftn.aplikacija.entity.klase.Korisnik;
 import rs.ftn.aplikacija.service.KorisnikService;
 
@@ -35,13 +37,22 @@ public class KorisnikController {
 
     //registracija korisnika
    @PostMapping("/registracija")
-    public ResponseEntity<Korisnik> registracija(@RequestBody Korisnik korisnik) {
+    public ResponseEntity<Korisnik> registracija(@RequestBody RegistracijaDto korisnik) {
         Korisnik sacuvan=korisnikService.registrujKorisnika(korisnik);
 
         if(sacuvan==null)
             return ResponseEntity.badRequest().build();
 
         return ResponseEntity.ok(sacuvan);
+    }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+        try{
+            Korisnik korisnik=korisnikService.login(loginDto.getKorisnickoIme(),loginDto.getLozinka());
+            return ResponseEntity.ok(korisnik);
+        }catch(RuntimeException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

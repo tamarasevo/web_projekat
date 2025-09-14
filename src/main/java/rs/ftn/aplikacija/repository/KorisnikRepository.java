@@ -9,4 +9,5 @@ import rs.ftn.aplikacija.entity.klase.Korisnik;
 //ima u sebi long count() metodu koja nam vraca broj
 //redova u tabeli
 public interface KorisnikRepository extends JpaRepository<Korisnik, Long> {
+    Korisnik findByKorisnickoIme(String korisnickoIme);
 }
