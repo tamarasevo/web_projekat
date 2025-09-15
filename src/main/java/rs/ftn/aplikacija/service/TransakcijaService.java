@@ -2,8 +2,10 @@ package rs.ftn.aplikacija.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import rs.ftn.aplikacija.dto.TransakcijaDto;
 import rs.ftn.aplikacija.entity.klase.Novcanik;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
 import rs.ftn.aplikacija.entity.klase.enums.Tip;
@@ -148,6 +150,36 @@ public class TransakcijaService {
         transakcijaRepository.save(t2);
     }
 
+    //dodavanje transakcije
+   /* public Transakcija dodajTransakcije(TransakcijaDto transakcija){
+        //prvo nadjemo novcanik kome pripada tarnsakcija
+        Novcanik novcanik=novcanikService.getById(transakcija.getNovcanikId());
+        if(novcanik==null){
+            return ResponseEntity.notFound().build();
+        }
+
+        //povezi transakcija sa novcanikom i povezi sa korisnikom
+       // transakcija.setNovcanik(novcanik);
+
+        //trebamo da stavimo transakciju sa korisiko kome pripada novcanik
+        //transakcija.setKorisnik(novcanik.getKorisnik());
+
+
+        //cuvamo transakciju
+        Transakcija sacuvana=transakcijaService.save(transakcija);
+        System.out.println("Pre update-a: " + novcanik.getTrenutnoStanje());
+        if(sacuvana.getTip()== Tip.PRIHOD){
+            novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().add(sacuvana.getIznos()));
+        }else if(sacuvana.getTip()==Tip.TROSAK) {
+            novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().subtract(sacuvana.getIznos()));
+        }
+
+        System.out.println("Tip transakcije: " + sacuvana.getTip());
+
+        //update novcanik
+        novcanikService.save(novcanik);
+    }
+*/
     //za pregled transakcije, po danu
     /*public List<Transakcija> findNovcanikAndDan(Long novcanikId,LocalDate datum){
         return transakcijaRepository.findByNovcanikAndDatumTransakcija(novcanikId,datum);

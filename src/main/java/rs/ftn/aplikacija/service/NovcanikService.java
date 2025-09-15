@@ -1,6 +1,8 @@
 package rs.ftn.aplikacija.service;
 
 import org.springframework.stereotype.Service;
+import rs.ftn.aplikacija.dto.NovcanikDto;
+import rs.ftn.aplikacija.entity.klase.Korisnik;
 import rs.ftn.aplikacija.entity.klase.Novcanik;
 import rs.ftn.aplikacija.repository.NovcanikRepository;
 
@@ -11,9 +13,11 @@ import java.util.List;
 public class NovcanikService {
 
     private final NovcanikRepository novcanikRepository;
+    private final KorisnikService korisnikService;
 
-    public NovcanikService(NovcanikRepository novcanikRepository) {
+    public NovcanikService(NovcanikRepository novcanikRepository, KorisnikService korisnikService) {
         this.novcanikRepository = novcanikRepository;
+        this.korisnikService = korisnikService;
     }
 
     public Novcanik getById(Long id){
@@ -40,6 +44,19 @@ public class NovcanikService {
         novcanik.setArhiviran(true);
         novcanikRepository.save(novcanik);
         return true;
+    }
+
+    public Novcanik dodajNovcanik(NovcanikDto novcanik){
+        Korisnik korisnik=korisnikService.getKorisnika(novcanik.getKorisnikID());
+        if(korisnik==null){
+            throw new IllegalStateException("Korisnik ne postoji korisnika!");
+        }
+        Novcanik novi=new Novcanik();
+        novi.setNaziv(novcanik.getNaziv());
+        novi.setKorisnik(korisnik);
+        novi.setPocetnoStanje(novcanik.getPocetnoStanje());
+        novcanikRepository.save(novi);
+        return novi;
     }
 
     //dobavljanje ukupnog stanja svih novcanika

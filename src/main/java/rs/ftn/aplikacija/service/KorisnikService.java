@@ -1,6 +1,7 @@
 package rs.ftn.aplikacija.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rs.ftn.aplikacija.dto.RegistracijaDto;
 import rs.ftn.aplikacija.entity.klase.Kategorija;
@@ -24,7 +25,8 @@ public class KorisnikService {
     private KategorijaRepository kategorijaRepository;
     @Autowired
     private ValutaRepository valutaRepository;
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     public KorisnikService(KorisnikRepository korisnikRepository) {
@@ -85,7 +87,7 @@ public class KorisnikService {
         korisnik.setPrezime(korisnikDTO.getPrezime());
         korisnik.setKorisnickoIme(korisnikDTO.getKorisnickoIme());
         korisnik.setMejl(korisnikDTO.getEmail());
-        korisnik.setLozinkaHash(korisnikDTO.getLozinka());
+        korisnik.setLozinkaHash(passwordEncoder.encode(korisnikDTO.getLozinka()));
         korisnik.setDatumRodjenja(korisnikDTO.getDatumRodjenja());
         korisnik.setUloga(Uloga.KORISNIK); // default uloga
         korisnik.setValuta(korisnikDTO.getValuta());
@@ -113,7 +115,7 @@ public class KorisnikService {
             throw new RuntimeException("Nepoznat korisnik.");
         }
 
-        if(!korisnik.getLozinkaHash().equals(korisnik.getLozinkaHash())){
+        if(!passwordEncoder.matches(lozinka,korisnik.getLozinkaHash())){
             throw new RuntimeException("Lozinka nije tacna.");
         }
         return korisnik;

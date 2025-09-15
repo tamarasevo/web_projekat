@@ -16,4 +16,5 @@ public class NovcanikDto {
     private BigDecimal pocetnoStanje;
     private String valuta;
     private boolean stedni;
+    private Long korisnikID;
 }

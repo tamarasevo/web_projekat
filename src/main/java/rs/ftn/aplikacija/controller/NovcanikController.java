@@ -4,6 +4,7 @@ import jakarta.persistence.Id;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rs.ftn.aplikacija.dto.NovcanikDto;
 import rs.ftn.aplikacija.entity.klase.Korisnik;
 import rs.ftn.aplikacija.entity.klase.Novcanik;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
@@ -33,16 +34,14 @@ public class NovcanikController {
 
     //dodavanje novcanika
     @PostMapping("/dodaj")
-    public ResponseEntity<Novcanik> dodajNovcanik(@RequestBody Novcanik novcanik,@RequestParam Long korisnikID) {
-        Korisnik korisnik =korisnikService.getKorisnika(korisnikID);
-
-        if(korisnik==null){
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<Novcanik> dodajNovcanik(@RequestBody NovcanikDto novcanik) {
+        try {
+            Novcanik sacuvan = novcanikService.dodajNovcanik(novcanik);
+            return ResponseEntity.ok(sacuvan);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
         }
 
-        novcanik.setKorisnik(korisnik);
-        Novcanik sacuvan=novcanikService.save(novcanik);
-        return ResponseEntity.ok(sacuvan);
     }
 
     //Azuriranje novcanika
