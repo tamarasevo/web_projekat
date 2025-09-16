@@ -72,6 +72,21 @@ public class NovcanikService {
         }
         return suma;
     }
+    //ispravak azuriranja novcanika
+    public Novcanik azurirajNovcanik(Long id, NovcanikDto novcanik) {
+        Novcanik novcanik1 = getById(id);
+        if (novcanik == null) {
+            return null;
+        }
+
+        novcanik1.setNaziv(novcanik.getNaziv());
+        //novcanik1.setTrenutnoStanje(novcanik.getPocetnoStanje());
+        novcanik1.setPocetnoStanje(novcanik.getPocetnoStanje());
+        novcanik1.setStedni(novcanik.isStedni());
+        novcanik1.setStedni(novcanik.isStedni());
+
+        return save(novcanik1);
+    }
 
     //daje samo stanje jednog novcanika
     public BigDecimal getStanjeNovcanika(Long novcanikId){

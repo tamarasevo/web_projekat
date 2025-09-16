@@ -46,23 +46,18 @@ public class NovcanikController {
 
     //Azuriranje novcanika
     @PutMapping("/{id}")
-    public ResponseEntity<Novcanik> izmeniNovcanik(@PathVariable Long id, @RequestBody Novcanik novcanikDetails){
-        Novcanik novcanik=novcanikService.getById(id);
-        if(novcanik==null)
+    public ResponseEntity<Novcanik> izmeniNovcanik(
+            @PathVariable Long id,
+            @RequestBody NovcanikDto novcanikDto) {
+
+        Novcanik izmenjen = novcanikService.azurirajNovcanik(novcanikDto);
+
+        if (izmenjen == null) {
             return ResponseEntity.notFound().build();
-
-        //sad stavljamo se informacije iz proslednjog
-        //novcanika u trenutni
-        novcanik.setNaziv(novcanikDetails.getNaziv());
-        novcanik.setTrenutnoStanje(novcanikDetails.getTrenutnoStanje());
-        novcanik.setPocetnoStanje(novcanikDetails.getPocetnoStanje());
-        novcanik.setArhiviran(novcanikDetails.isArhiviran());
-        novcanik.setStedni(novcanikDetails.isStedni());
-
-        Novcanik izmenjen=novcanikService.save(novcanik);
-        //.ok() nam vraca informaciju o novcaniku
+        }
         return ResponseEntity.ok(izmenjen);
     }
+
 
     //Brisanje novcanika
     @DeleteMapping("/obrisi/{id}")

@@ -178,18 +178,22 @@ public class TransakcijaService {
 
         //update novcanik
         novcanikService.save(novcanik);
-    }
-*/
+    }*/
+
     //za pregled transakcije, po danu
-    /*public List<Transakcija> findNovcanikAndDan(Long novcanikId,LocalDate datum){
-        return transakcijaRepository.findByNovcanikAndDatumTransakcija(novcanikId,datum);
-    }*/
+    public List<Object[]> pregledDnevnihTransakcija(Long korisnikId){
+        return transakcijaRepository.getDnevniPrikaz(korisnikId);
+    }
+    public List<Object[]> pregledNedeljnihTransakcija(Long korisnikId){
+        return transakcijaRepository.getNedeljniPrikaz(korisnikId);
+    }
+    public List<Object[]> pregledMesecnikTransakcija(Long korisnikId){
+        return transakcijaRepository.getNedeljniPrikaz(korisnikId);
+    }
+    public List<Object[]> pregledGodisnjihTransakcija(Long korisnikId){
+        return transakcijaRepository.getNedeljniPrikaz(korisnikId);
+    }
 
-   /* public List<Transakcija> findByNovcanikAndNedelja(Long novcanikId,LocalDate datum){
-        LocalDate start=datum.with(DayOfWeek.MONDAY);
-        LocalDate end=datum.with(DayOfWeek.SATURDAY);
-
-    }*/
 
 
 }
