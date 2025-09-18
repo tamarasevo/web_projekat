@@ -46,8 +46,8 @@ public class NovcanikService {
         return true;
     }
 
-    public Novcanik dodajNovcanik(NovcanikDto novcanik){
-        Korisnik korisnik=korisnikService.getKorisnika(novcanik.getKorisnikID());
+    public Novcanik dodajNovcanik(NovcanikDto novcanik, Long id){
+        Korisnik korisnik=korisnikService.getKorisnika(id);
         if(korisnik==null){
             throw new IllegalStateException("Korisnik ne postoji korisnika!");
         }

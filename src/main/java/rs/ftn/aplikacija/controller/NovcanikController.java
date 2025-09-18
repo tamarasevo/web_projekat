@@ -33,10 +33,10 @@ public class NovcanikController {
     }
 
     //dodavanje novcanika
-    @PostMapping("/dodaj")
-    public ResponseEntity<Novcanik> dodajNovcanik(@RequestBody NovcanikDto novcanik) {
+    @PostMapping("{id}/dodaj")
+    public ResponseEntity<Novcanik> dodajNovcanik(@RequestBody NovcanikDto novcanik,@PathVariable Long id) {
         try {
-            Novcanik sacuvan = novcanikService.dodajNovcanik(novcanik);
+            Novcanik sacuvan = novcanikService.dodajNovcanik(novcanik,id);
             return ResponseEntity.ok(sacuvan);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
@@ -50,7 +50,7 @@ public class NovcanikController {
             @PathVariable Long id,
             @RequestBody NovcanikDto novcanikDto) {
 
-        Novcanik izmenjen = novcanikService.azurirajNovcanik(novcanikDto);
+        Novcanik izmenjen = novcanikService.azurirajNovcanik(id, novcanikDto);
 
         if (izmenjen == null) {
             return ResponseEntity.notFound().build();
@@ -83,18 +83,6 @@ public class NovcanikController {
 
         return ResponseEntity.ok(transakcije);
     }
-
-   /* //pregled stanja
-    @GetMapping("/{novcanikId}/stanje")
-    public ResponseEntity<BigDecimal> pregledStanje(@PathVariable Long novcanikId){
-        Novcanik novcanik=novcanikService.getById(novcanikId);
-        if(novcanik==null)
-            return ResponseEntity.notFound().build();
-
-        BigDecimal stanje=novcanik.getTrenutnoStanje();
-
-        return ResponseEntity.ok(stanje);
-    }*/
 
     //ovde samo pozivamao metodu za arhiviranje ne moze ovde menjati
     //contorller samo prima i prosledjuje zahteve servisu

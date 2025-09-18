@@ -2,10 +2,13 @@ package rs.ftn.aplikacija.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import rs.ftn.aplikacija.dto.TransakcijaDto;
+import rs.ftn.aplikacija.entity.klase.Kategorija;
 import rs.ftn.aplikacija.entity.klase.Novcanik;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
 import rs.ftn.aplikacija.entity.klase.enums.Tip;
@@ -13,9 +16,11 @@ import rs.ftn.aplikacija.entity.klase.enums.Ucestalost;
 import rs.ftn.aplikacija.repository.TransakcijaRepository;
 import rs.ftn.aplikacija.entity.klase.Transfer;
 
+
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -151,11 +156,11 @@ public class TransakcijaService {
     }
 
     //dodavanje transakcije
-   /* public Transakcija dodajTransakcije(TransakcijaDto transakcija){
+   public Transakcija dodajTransakcije(TransakcijaDto transakcija){
         //prvo nadjemo novcanik kome pripada tarnsakcija
         Novcanik novcanik=novcanikService.getById(transakcija.getNovcanikId());
         if(novcanik==null){
-            return ResponseEntity.notFound().build();
+          throw new RuntimeException("Nema dodaj transakcije");
         }
 
         //povezi transakcija sa novcanikom i povezi sa korisnikom
@@ -166,19 +171,26 @@ public class TransakcijaService {
 
 
         //cuvamo transakciju
-        Transakcija sacuvana=transakcijaService.save(transakcija);
-        System.out.println("Pre update-a: " + novcanik.getTrenutnoStanje());
+        Transakcija sacuvana=new Transakcija();
+        Novcanik n=novcanikService.getById(transakcija.getNovcanikId());
+        sacuvana.setNovcanik(n);
+        sacuvana.setIznos(transakcija.getIznos());
+        sacuvana.setTip(transakcija.getTip());
+        sacuvana.setDatumTransakcije(LocalDate.now());
+        sacuvana.setNaziv(transakcija.getNaziv());
+        //System.out.println("Pre update-a: " + novcanik.getTrenutnoStanje());
         if(sacuvana.getTip()== Tip.PRIHOD){
             novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().add(sacuvana.getIznos()));
         }else if(sacuvana.getTip()==Tip.TROSAK) {
             novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().subtract(sacuvana.getIznos()));
         }
 
-        System.out.println("Tip transakcije: " + sacuvana.getTip());
+       // System.out.println("Tip transakcije: " + sacuvana.getTip());
 
         //update novcanik
         novcanikService.save(novcanik);
-    }*/
+        return  sacuvana;
+    }
 
     //za pregled transakcije, po danu
     public List<Object[]> pregledDnevnihTransakcija(Long korisnikId){
@@ -193,6 +205,13 @@ public class TransakcijaService {
     public List<Object[]> pregledGodisnjihTransakcija(Long korisnikId){
         return transakcijaRepository.getNedeljniPrikaz(korisnikId);
     }
+
+    public List<Transakcija> findTopTroskovi(LocalDate odDatuma,LocalDate doDatuma){
+        Pageable top= PageRequest.of(0, 10);
+        return transakcijaRepository.findTopTroskovi(odDatuma,doDatuma,top);
+    }
+
+
 
 
 

@@ -13,6 +13,8 @@ import rs.ftn.aplikacija.service.NovcanikService;
 import rs.ftn.aplikacija.service.TransakcijaService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 //rest kontorler nam treba jer ce nam on vratiti podatke
 //koje cemo koristiti u frontendu
@@ -96,6 +98,12 @@ public class TransakcijaController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @GetMapping("/top10troskova")
+    public ResponseEntity<List<Transakcija>> top10troskova(@RequestParam LocalDate odDatuma,@RequestParam LocalDate doDatuma){
+        List<Transakcija> transakcije=transakcijaService.findTopTroskovi(odDatuma,doDatuma);
+        return ResponseEntity.ok(transakcije);
     }
 
 

@@ -118,6 +118,9 @@ public class KorisnikService {
         if(!passwordEncoder.matches(lozinka,korisnik.getLozinkaHash())){
             throw new RuntimeException("Lozinka nije tacna.");
         }
+        korisnik.setDatumPoslednjegLogovanja(LocalDate.now());
+        korisnikRepository.save(korisnik);
+
         return korisnik;
     }
 }

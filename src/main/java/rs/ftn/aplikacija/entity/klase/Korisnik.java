@@ -36,6 +36,8 @@ public class Korisnik {
     private LocalDate datumRegistracije;
     private boolean blokiran;
 
+    private LocalDate datumPoslednjegLogovanja;
+
     private String valuta;
 
 

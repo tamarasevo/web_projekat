@@ -14,9 +14,11 @@ import java.time.LocalDate;
 @Setter
 public class TransakcijaDto {
     private Long novcanikId;
+    private String naziv;
+    //private String valuta;
     private BigDecimal iznos;
     private Tip tip;
     //private Kategorija kategorija;
-    private LocalDate datum;
+    //private LocalDate datum; //prihvata datum unosa transakcije
     ;
 }
