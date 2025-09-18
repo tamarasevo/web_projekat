@@ -6,7 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
 
-import java.time.LocalDate;
+//import java.time.LocalDate;
 import java.util.List;
 
 
