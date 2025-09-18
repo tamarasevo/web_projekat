@@ -18,6 +18,7 @@ public interface TransakcijaRepository extends JpaRepository<Transakcija, Long> 
    // List<Transakcija> findByNovcanikAndDatumTransakcija(Long novcanikId, LocalDate datum);
 
     //Dnevni pregled
+    //jdfhsd
     @Query("SELECT t.datumTransakcije, " +
             "SUM(CASE WHEN t.tip = 'PRIHOD' THEN t.iznos ELSE 0 END), " +
             "SUM(CASE WHEN t.tip = 'TROSAK' THEN t.iznos ELSE 0 END) " +
