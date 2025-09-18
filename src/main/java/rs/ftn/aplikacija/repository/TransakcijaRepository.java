@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 
+//transakcije
 @Repository
 public interface TransakcijaRepository extends JpaRepository<Transakcija, Long> {
    //treba nam upit da u nekom novcaniku trazi transakcije
@@ -18,7 +19,6 @@ public interface TransakcijaRepository extends JpaRepository<Transakcija, Long> 
    // List<Transakcija> findByNovcanikAndDatumTransakcija(Long novcanikId, LocalDate datum);
 
     //Dnevni pregled
-    //jdfhsd
     @Query("SELECT t.datumTransakcije, " +
             "SUM(CASE WHEN t.tip = 'PRIHOD' THEN t.iznos ELSE 0 END), " +
             "SUM(CASE WHEN t.tip = 'TROSAK' THEN t.iznos ELSE 0 END) " +
