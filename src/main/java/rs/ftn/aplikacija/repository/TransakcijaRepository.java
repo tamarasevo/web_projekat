@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
+//transakcije
 @Repository
 public interface TransakcijaRepository extends JpaRepository<Transakcija, Long> {
    //treba nam upit da u nekom novcaniku trazi transakcije
