@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import rs.ftn.aplikacija.dto.GoalDto;
+import rs.ftn.aplikacija.dto.TransakcijaDto;
 import rs.ftn.aplikacija.entity.klase.Goal;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
 import rs.ftn.aplikacija.service.GoalService;
@@ -21,9 +22,9 @@ public class GoalController {
         this.goalService = goalService;
     }
 
-    @PostMapping("/dodaj")
-    public ResponseEntity<?> dodajGoal(@RequestBody GoalDto goalDto) {
-        Goal cilj=goalService.dodajGoal(goalDto.getNaziv(),goalDto.getIznos(),goalDto.getKrajnjiCilj(),goalDto.getNovcanikId());
+    @PostMapping("/dodaj/{novcanikId}")
+    public ResponseEntity<?> dodajGoal(@RequestBody GoalDto goalDto,@PathVariable Long novcanikId) {
+        Goal cilj=goalService.dodajGoal(goalDto.getNaziv(),goalDto.getIznos(),goalDto.getKrajnjiCilj(),novcanikId);
 
         if(cilj==null){
             return ResponseEntity.noContent().build();
@@ -31,14 +32,20 @@ public class GoalController {
         return ResponseEntity.ok(cilj);
     }
 
-    @PutMapping("/azuriraj")
-    public ResponseEntity<String> azurirajGoal(@RequestBody Transakcija transakcija) {
+    @PutMapping("{id1}/{id2}/azuriraj")
+    public ResponseEntity<String> azurirajGoal(@RequestBody TransakcijaDto transakcija, @PathVariable Long id1,@PathVariable Long id2) {
        try {
-           goalService.azurirajGoal(transakcija);
-           return ResponseEntity.ok("Azuriranje goal klase je uspesno!");
+           goalService.azurirajGoal(id1,id2,transakcija);
+           return ResponseEntity.ok("Azuriranje goal klase je uspelo!");
        }catch (RuntimeException ex){
            return ResponseEntity.badRequest().body(ex.getMessage());
        }
+    }
+
+    @GetMapping("/get/{id}")
+    public ResponseEntity<Goal> getGoal(@PathVariable Long id){
+        Goal g=goalService.getGoal(id);
+        return ResponseEntity.ok(g);
     }
 
 

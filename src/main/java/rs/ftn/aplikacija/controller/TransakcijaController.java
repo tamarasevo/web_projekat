@@ -1,18 +1,25 @@
 package rs.ftn.aplikacija.controller;
 
-
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rs.ftn.aplikacija.dto.KorisnikDTO;
 import rs.ftn.aplikacija.dto.TransakcijaDto;
+import rs.ftn.aplikacija.dto.TransferDTO;
+import rs.ftn.aplikacija.entity.klase.Korisnik;
 import rs.ftn.aplikacija.entity.klase.Novcanik;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
+import rs.ftn.aplikacija.entity.klase.Transfer;
 import rs.ftn.aplikacija.entity.klase.enums.Tip;
 import rs.ftn.aplikacija.entity.klase.enums.Ucestalost;
+import rs.ftn.aplikacija.service.KorisnikService;
 import rs.ftn.aplikacija.service.NovcanikService;
 import rs.ftn.aplikacija.service.TransakcijaService;
+import org.springframework.security.core.Authentication;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 //rest kontorler nam treba jer ce nam on vratiti podatke
 //koje cemo koristiti u frontendu
@@ -28,39 +35,18 @@ public class TransakcijaController {
         this.novcanikService = novcanikService;
         this.transakcijaService = transakcijaService;
     }
+    @Autowired
+    private KorisnikService korisnikService;
 
     //dodaj transakciju(iznos,tip,datum,kategorija)
     @PostMapping("{novcanikId}/dodaj")
-    public ResponseEntity<Transakcija> dodajTransakcija(@RequestBody Transakcija transakcija,@PathVariable Long novcanikId) {
+    public ResponseEntity<Transakcija> dodajTransakcija(@RequestBody TransakcijaDto transakcija,@PathVariable Long novcanikId) {
 
         //prvo nadjemo novcanik kome pripada tarnsakcija
-        Novcanik novcanik=novcanikService.getById(novcanikId);
-        if(novcanik==null){
-            return ResponseEntity.notFound().build();
-        }
 
-        //povezi transakcija sa novcanikom i povezi sa korisnikom
-        transakcija.setNovcanik(novcanik);
-
-        //trebamo da stavimo transakciju sa korisiko kome pripada novcanik
-        transakcija.setKorisnik(novcanik.getKorisnik());
-
-
-        //cuvamo transakciju
-        Transakcija sacuvana=transakcijaService.save(transakcija);
-        System.out.println("Pre update-a: " + novcanik.getTrenutnoStanje());
-        if(sacuvana.getTip()== Tip.PRIHOD){
-            novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().add(sacuvana.getIznos()));
-        }else if(sacuvana.getTip()==Tip.TROSAK) {
-            novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().subtract(sacuvana.getIznos()));
-        }
-
-        System.out.println("Tip transakcije: " + sacuvana.getTip());
-
-        //update novcanik
-        novcanikService.save(novcanik);
-
-        return ResponseEntity.ok(sacuvana);
+           // transakcijaDto.setNovcanikId(novcanikId); // osiguravamo da DTO ima novcanikId
+            Transakcija sacuvana = transakcijaService.dodajTransakcije(transakcija,novcanikId);
+            return ResponseEntity.ok(sacuvana);
     }
 
     //dodavanje ponavljajuce transakcije
@@ -88,15 +74,127 @@ public class TransakcijaController {
     }
 
     //transfer izmedju dva novcanika
-    @PostMapping("/transfer")
-    public ResponseEntity<String> transfer(@RequestParam Long izNovcanika, @RequestParam Long uNovcanik, @RequestParam BigDecimal iznos){
-        try {
-            transakcijaService.transferIzmedjuNovcanika(izNovcanika, uNovcanik, iznos);
+    @PostMapping("/transfer/{id1}/{id2}")
+    public ResponseEntity<String> transfer(@RequestBody TransferDTO transfer,@PathVariable Long id1,@PathVariable Long id2) {
+
+        System.out.println("Transfer"+transfer);
+        transakcijaService.transferIzmedjuNovcanika(id1, id2, transfer.getIznos());
             return ResponseEntity.ok("Transfer uspešno izvršen");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+
     }
+
+    @GetMapping("/top10troskova")
+    public ResponseEntity<List<Transakcija>> top10troskova(@RequestParam LocalDate odDatuma,@RequestParam LocalDate doDatuma){
+        List<Transakcija> transakcije=transakcijaService.findTopTroskovi(odDatuma,doDatuma);
+        return ResponseEntity.ok(transakcije);
+    }
+
+
+    //pregled za korisnika njegovi dnevni mesecni nedeljni i godisnji troskovi
+    @GetMapping("/dnevni")
+    public List<Transakcija> dnevniPregled(
+            @RequestParam String datum,                  // yyyy-MM-dd
+            @RequestParam(required = false) String tip,   // PRIHOD / TROSAK / null = oba
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+        Korisnik korisnik = korisnikService.getKorisnickoIme(username);
+        Long korisnikId = korisnik.getId();
+
+        LocalDate localDate = LocalDate.parse(datum);
+
+        if(tip == null) {
+            List<Transakcija> prihodi = transakcijaService.dnevniPrihodi(korisnikId, localDate);
+            List<Transakcija> troskovi = transakcijaService.dnevniTroskovi(korisnikId, localDate);
+            prihodi.addAll(troskovi);
+            return prihodi;
+        }
+
+        return tip.equalsIgnoreCase("PRIHOD")
+                ? transakcijaService.dnevniPrihodi(korisnikId, localDate)
+                : transakcijaService.dnevniTroskovi(korisnikId, localDate);
+    }
+
+    @GetMapping("/nedeljni")
+    public List<Transakcija> nedeljniPregled(
+            @RequestParam String start,
+            @RequestParam String end,// yyyy-MM-dd
+            @RequestParam(required = false) String tip,   // PRIHOD / TROSAK / null = oba
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+        Korisnik korisnik = korisnikService.getKorisnickoIme(username);
+        Long korisnikId = korisnik.getId();
+
+        LocalDate localDate1 = LocalDate.parse(start);
+        LocalDate localDate2 = LocalDate.parse(end);
+
+        if(tip == null) {
+            List<Transakcija> prihodi = transakcijaService.nedeljniPrihodi(korisnikId, localDate1, localDate2);
+            List<Transakcija> troskovi = transakcijaService.nedeljniTroskovi(korisnikId, localDate1,localDate2);
+            prihodi.addAll(troskovi);
+            return prihodi;
+        }
+
+        return tip.equalsIgnoreCase("PRIHOD")
+                ? transakcijaService.nedeljniPrihodi(korisnikId, localDate1,localDate2)
+                : transakcijaService.nedeljniTroskovi(korisnikId, localDate1,localDate2);
+    }
+
+    @GetMapping("/mesecni")
+    public List<Transakcija> mesecniPregled(
+            @RequestParam String start,
+            @RequestParam String end,// yyyy-MM-dd
+            @RequestParam(required = false) String tip,   // PRIHOD / TROSAK / null = oba
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+        Korisnik korisnik = korisnikService.getKorisnickoIme(username);
+        Long korisnikId = korisnik.getId();
+
+        LocalDate localDate1 = LocalDate.parse(start);
+        LocalDate localDate2 = LocalDate.parse(end);
+
+        if(tip == null) {
+            List<Transakcija> prihodi = transakcijaService.mesecniPrihodi(korisnikId, localDate1, localDate2);
+            List<Transakcija> troskovi = transakcijaService.mesecniTroskovi(korisnikId, localDate1,localDate2);
+            prihodi.addAll(troskovi);
+            return prihodi;
+        }
+
+        return tip.equalsIgnoreCase("PRIHOD")
+                ? transakcijaService.mesecniPrihodi(korisnikId, localDate1,localDate2)
+                : transakcijaService.mesecniTroskovi(korisnikId, localDate1,localDate2);
+    }
+
+    @GetMapping("/godisnji")
+    public List<Transakcija> godisnjiPregled(
+            @RequestParam String start,
+            @RequestParam String end,// yyyy-MM-dd
+            @RequestParam(required = false) String tip,   // PRIHOD / TROSAK / null = oba
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+        Korisnik korisnik = korisnikService.getKorisnickoIme(username);
+        Long korisnikId = korisnik.getId();
+
+        LocalDate localDate1 = LocalDate.parse(start);
+        LocalDate localDate2 = LocalDate.parse(end);
+
+        if(tip == null) {
+            List<Transakcija> prihodi = transakcijaService.godisnjiPrihodi(korisnikId, localDate1, localDate2);
+            List<Transakcija> troskovi = transakcijaService.godisnjiTroskovi(korisnikId, localDate1,localDate2);
+            prihodi.addAll(troskovi);
+            return prihodi;
+        }
+
+        return tip.equalsIgnoreCase("PRIHOD")
+                ? transakcijaService.godisnjiPrihodi(korisnikId, localDate1,localDate2)
+                : transakcijaService.godisnjiTroskovi(korisnikId, localDate1,localDate2);
+    }
+
+
+
 
 
 }

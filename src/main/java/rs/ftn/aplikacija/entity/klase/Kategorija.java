@@ -1,5 +1,7 @@
 package rs.ftn.aplikacija.entity.klase;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import rs.ftn.aplikacija.entity.klase.enums.Tip;
 import lombok.AllArgsConstructor;
@@ -31,10 +33,12 @@ public class Kategorija {
 
     //veza sa transakcijama
     @OneToMany(mappedBy="kategorije", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Set<Transakcija> transakcije=new HashSet<>();
 
     //veza sa korisnikom
     @ManyToOne
+    @JsonBackReference
     private Korisnik korisnik;
 
 

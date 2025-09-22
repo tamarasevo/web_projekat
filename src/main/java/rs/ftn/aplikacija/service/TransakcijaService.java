@@ -2,10 +2,13 @@ package rs.ftn.aplikacija.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import rs.ftn.aplikacija.dto.TransakcijaDto;
+import rs.ftn.aplikacija.entity.klase.Kategorija;
 import rs.ftn.aplikacija.entity.klase.Novcanik;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
 import rs.ftn.aplikacija.entity.klase.enums.Tip;
@@ -13,9 +16,11 @@ import rs.ftn.aplikacija.entity.klase.enums.Ucestalost;
 import rs.ftn.aplikacija.repository.TransakcijaRepository;
 import rs.ftn.aplikacija.entity.klase.Transfer;
 
+
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -118,6 +123,9 @@ public class TransakcijaService {
         Novcanik iz=novcanikService.getById(izNovcanika);
         Novcanik u=novcanikService.getById(uNovcanik);
 
+        if (iz == null || u == null) {
+            throw new RuntimeException("Jedan od novčanika ne postoji");
+        }
         if(iz.getTrenutnoStanje().compareTo(iznos)<0){
             throw new RuntimeException("Nema dovoljno sredstava");
         }
@@ -151,11 +159,11 @@ public class TransakcijaService {
     }
 
     //dodavanje transakcije
-   /* public Transakcija dodajTransakcije(TransakcijaDto transakcija){
+   public Transakcija dodajTransakcije(TransakcijaDto transakcija,Long novcanikID){
         //prvo nadjemo novcanik kome pripada tarnsakcija
-        Novcanik novcanik=novcanikService.getById(transakcija.getNovcanikId());
+        Novcanik novcanik=novcanikService.getById(novcanikID);
         if(novcanik==null){
-            return ResponseEntity.notFound().build();
+          throw new RuntimeException("Novcanik nije pronadjenn");
         }
 
         //povezi transakcija sa novcanikom i povezi sa korisnikom
@@ -166,19 +174,29 @@ public class TransakcijaService {
 
 
         //cuvamo transakciju
-        Transakcija sacuvana=transakcijaService.save(transakcija);
-        System.out.println("Pre update-a: " + novcanik.getTrenutnoStanje());
+        Transakcija sacuvana=new Transakcija();
+        //Novcanik n=novcanikService.getById(transakcija.getNovcanikId());
+        sacuvana.setNovcanik(novcanik);
+        sacuvana.setKorisnik(novcanik.getKorisnik());
+        sacuvana.setIznos(transakcija.getIznos());
+        sacuvana.setTip(transakcija.getTip());
+        sacuvana.setPonavljajuca(transakcija.isPonavljajuca());
+        sacuvana.setDatumTransakcije(LocalDate.now());
+        sacuvana.setNaziv(transakcija.getNaziv());
+        //System.out.println("Pre update-a: " + novcanik.getTrenutnoStanje());
         if(sacuvana.getTip()== Tip.PRIHOD){
             novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().add(sacuvana.getIznos()));
         }else if(sacuvana.getTip()==Tip.TROSAK) {
             novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().subtract(sacuvana.getIznos()));
         }
 
-        System.out.println("Tip transakcije: " + sacuvana.getTip());
+       // System.out.println("Tip transakcije: " + sacuvana.getTip());
 
         //update novcanik
+       transakcijaRepository.save(sacuvana);
         novcanikService.save(novcanik);
-    }*/
+        return  sacuvana;
+    }
 
     //za pregled transakcije, po danu
     public List<Object[]> pregledDnevnihTransakcija(Long korisnikId){
@@ -193,6 +211,73 @@ public class TransakcijaService {
     public List<Object[]> pregledGodisnjihTransakcija(Long korisnikId){
         return transakcijaRepository.getNedeljniPrikaz(korisnikId);
     }
+
+    public List<Transakcija> findTopTroskovi(LocalDate odDatuma,LocalDate doDatuma){
+        Pageable top= PageRequest.of(0, 10);
+        return transakcijaRepository.findTopTroskovi(odDatuma,doDatuma,top);
+    }
+
+
+    //pregled transakcija za korisnika 2.6
+    public List<Transakcija> dnevniPrihodi(Long korisnikId, LocalDate datum) {
+        return transakcijaRepository.dnevniPregled(korisnikId, datum)
+                .stream()
+                .filter(t -> t.getTip() == Tip.PRIHOD)
+                .toList();
+    }
+
+    public List<Transakcija> dnevniTroskovi(Long korisnikId, LocalDate datum) {
+        return transakcijaRepository.dnevniPregled(korisnikId, datum)
+                .stream()
+                .filter(t -> t.getTip() == Tip.TROSAK)
+                .toList();
+    }
+
+    //nedeljni
+    public List<Transakcija> nedeljniPrihodi(Long korisnikId, LocalDate start, LocalDate end) {
+        return transakcijaRepository.nedeljniPregled(korisnikId, start, end)
+                .stream()
+                .filter(t -> t.getTip() == Tip.PRIHOD)
+                .toList();
+    }
+
+    public List<Transakcija> nedeljniTroskovi(Long korisnikId, LocalDate start, LocalDate end) {
+        return transakcijaRepository.nedeljniPregled(korisnikId, start, end)
+                .stream()
+                .filter(t -> t.getTip() == Tip.TROSAK)
+                .toList();
+    }
+
+    //mesecni pregled
+    public List<Transakcija> mesecniPrihodi(Long korisnikId, LocalDate start, LocalDate end) {
+        return transakcijaRepository.mesecniPregled(korisnikId, start, end)
+                .stream()
+                .filter(t -> t.getTip() == Tip.PRIHOD)
+                .toList();
+    }
+
+    public List<Transakcija> mesecniTroskovi(Long korisnikId, LocalDate start, LocalDate end) {
+        return transakcijaRepository.mesecniPregled(korisnikId, start, end)
+                .stream()
+                .filter(t -> t.getTip() == Tip.TROSAK)
+                .toList();
+    }
+
+    //godisnji pregled
+    public List<Transakcija> godisnjiPrihodi(Long korisnikId, LocalDate start, LocalDate end) {
+        return transakcijaRepository.godisnjiPregled(korisnikId, start, end)
+                .stream()
+                .filter(t -> t.getTip() == Tip.PRIHOD)
+                .toList();
+    }
+    public List<Transakcija> godisnjiTroskovi(Long korisnikId, LocalDate start, LocalDate end) {
+        return transakcijaRepository.godisnjiPregled(korisnikId, start, end)
+                .stream()
+                .filter(t -> t.getTip() == Tip.TROSAK)
+                .toList();
+    }
+
+
 
 
 

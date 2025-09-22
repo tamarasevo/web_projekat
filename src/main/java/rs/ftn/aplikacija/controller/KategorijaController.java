@@ -4,6 +4,7 @@ package rs.ftn.aplikacija.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rs.ftn.aplikacija.dto.KategorijaDTO;
 import rs.ftn.aplikacija.entity.klase.Kategorija;
 import rs.ftn.aplikacija.service.KategorijaService;
 
@@ -35,7 +36,7 @@ public class KategorijaController {
 
     //dodavanje kategorije
     @PostMapping("/korisnik/{korisnikId}/dodaj")
-    public ResponseEntity<Kategorija> dodajKategoriju(@PathVariable Long korisnikId,@RequestBody Kategorija kategorija){
+    public ResponseEntity<Kategorija> dodajKategoriju(@PathVariable Long korisnikId,@RequestBody KategorijaDTO kategorija){
         Kategorija nova=kategorijaService.dodajKategoriju(kategorija,korisnikId);
         return ResponseEntity.ok(nova);
     }

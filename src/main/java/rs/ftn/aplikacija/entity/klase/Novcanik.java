@@ -2,6 +2,7 @@ package rs.ftn.aplikacija.entity.klase;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,14 +28,16 @@ public class Novcanik {
     private String naziv;
     private BigDecimal pocetnoStanje;
     private BigDecimal trenutnoStanje;
-    private LocalDate datumKreiranja;
+    private LocalDateTime datumKreiranja;
     private boolean stedni;
     //po defalutu mora biti false
     private boolean arhiviran=false;
 
     //veza, jedna valuta moze biti u vise novcanika
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "valuta_id")
     private Valuta valuta;
+
 
     //jedan korisnik moze imati vise novcanika
     @ManyToOne
@@ -41,6 +45,7 @@ public class Novcanik {
     private Korisnik korisnik;
 
     @OneToMany(mappedBy="novcanik", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private Set<Transakcija> transakcije=new HashSet<>();
 
     //ovo am ne treba jer imam jedan cilj po novcaniku
@@ -55,7 +60,7 @@ public class Novcanik {
         this.pocetnoStanje = pocetnoStanje;
         this.trenutnoStanje = trenutnoStanje;
         this.valuta = valuta;
-        this.datumKreiranja = datumKreiranja;
+        this.datumKreiranja = datumKreiranja.atStartOfDay();
         this.korisnik = korisnik;
         this.stedni = stedni;
         this.arhiviran = arhiviran;

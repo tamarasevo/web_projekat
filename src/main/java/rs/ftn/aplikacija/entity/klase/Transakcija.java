@@ -1,6 +1,7 @@
 package rs.ftn.aplikacija.entity.klase;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -43,11 +44,13 @@ public class Transakcija {
 
     //1 nocanik, 1 korisnik, ali korisnik ima vise novcanika
     @ManyToOne
+    @JsonBackReference
     private Novcanik novcanik;
 
     //razmisliti da li ukloniti
     //1 transakcija 1 korisnik, ali 1 korisnik moze imati vise transakcija
     @ManyToOne
+    @JsonBackReference
     private Korisnik korisnik;
 
     public Transakcija(String naziv, BigDecimal iznos, Tip tip,boolean ponavljajuca,LocalDate datumTransakcije,Ucestalost ucestalost) {

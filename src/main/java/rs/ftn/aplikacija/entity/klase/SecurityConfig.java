@@ -19,12 +19,14 @@ public class SecurityConfig{
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())      // isključujemo CSRF za REST
+                .csrf(csrf -> csrf.disable())  // isključujemo CSRF
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // dozvoljavamo H2 konzolu
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()      // svi endpoint-i slobodni
+                        .requestMatchers("/h2-console/**").permitAll() // H2 konzola slobodna
+                        .anyRequest().permitAll() // svi ostali endpointi slobodni
                 )
-                .formLogin(form -> form.disable()) // onemogućavamo form login
-                .httpBasic(basic-> basic.disable()); // onemogućavamo basic auth
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable());
 
         return http.build();
     }

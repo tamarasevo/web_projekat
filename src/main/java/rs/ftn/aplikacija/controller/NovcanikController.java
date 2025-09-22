@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.ftn.aplikacija.dto.NovcanikDto;
+import rs.ftn.aplikacija.dto.TransakcijaDto;
 import rs.ftn.aplikacija.entity.klase.Korisnik;
 import rs.ftn.aplikacija.entity.klase.Novcanik;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
@@ -12,6 +13,7 @@ import rs.ftn.aplikacija.repository.KorisnikRepository;
 import rs.ftn.aplikacija.service.KorisnikService;
 import rs.ftn.aplikacija.service.NovcanikService;
 import rs.ftn.aplikacija.service.TransakcijaService;
+
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,14 +35,11 @@ public class NovcanikController {
     }
 
     //dodavanje novcanika
-    @PostMapping("/dodaj")
-    public ResponseEntity<Novcanik> dodajNovcanik(@RequestBody NovcanikDto novcanik) {
-        try {
-            Novcanik sacuvan = novcanikService.dodajNovcanik(novcanik);
+    @PostMapping("{id}/dodaj")
+    public ResponseEntity<Novcanik> dodajNovcanik(@RequestBody NovcanikDto novcanik,@PathVariable Long id) {
+
+            Novcanik sacuvan = novcanikService.dodajNovcanik(novcanik,id);
             return ResponseEntity.ok(sacuvan);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
 
     }
 
@@ -50,7 +49,7 @@ public class NovcanikController {
             @PathVariable Long id,
             @RequestBody NovcanikDto novcanikDto) {
 
-        Novcanik izmenjen = novcanikService.azurirajNovcanik(novcanikDto);
+        Novcanik izmenjen = novcanikService.azurirajNovcanik(id, novcanikDto);
 
         if (izmenjen == null) {
             return ResponseEntity.notFound().build();
@@ -76,25 +75,16 @@ public class NovcanikController {
 
     //pregled transakcija po novcaniku
     @GetMapping("/{novcanikId}/transakcije")
-    public ResponseEntity<List<Transakcija>> pregledTransakcija(@PathVariable Long novcanikId){
+    public ResponseEntity<List<TransakcijaDto>> pregledTransakcija(@PathVariable Long novcanikId){
         List<Transakcija> transakcije=transakcijaService.getTransakcije(novcanikId);
         if(transakcije.isEmpty())
             return ResponseEntity.noContent().build();
+        List<TransakcijaDto> dtoList = transakcije.stream()
+                .map(TransakcijaDto::new)
+                .toList();
 
-        return ResponseEntity.ok(transakcije);
+        return ResponseEntity.ok(dtoList);
     }
-
-   /* //pregled stanja
-    @GetMapping("/{novcanikId}/stanje")
-    public ResponseEntity<BigDecimal> pregledStanje(@PathVariable Long novcanikId){
-        Novcanik novcanik=novcanikService.getById(novcanikId);
-        if(novcanik==null)
-            return ResponseEntity.notFound().build();
-
-        BigDecimal stanje=novcanik.getTrenutnoStanje();
-
-        return ResponseEntity.ok(stanje);
-    }*/
 
     //ovde samo pozivamao metodu za arhiviranje ne moze ovde menjati
     //contorller samo prima i prosledjuje zahteve servisu

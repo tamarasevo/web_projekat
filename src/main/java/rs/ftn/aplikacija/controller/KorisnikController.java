@@ -1,11 +1,18 @@
 package rs.ftn.aplikacija.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rs.ftn.aplikacija.dto.KorisnikDTO;
 import rs.ftn.aplikacija.dto.LoginDto;
 import rs.ftn.aplikacija.dto.RegistracijaDto;
 import rs.ftn.aplikacija.entity.klase.Korisnik;
+import rs.ftn.aplikacija.entity.klase.Transakcija;
 import rs.ftn.aplikacija.service.KorisnikService;
+import rs.ftn.aplikacija.service.TransakcijaService;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -26,9 +33,9 @@ public class KorisnikController {
         return ResponseEntity.ok(broj);
     }
     @PutMapping("/profil/{korisnikId}")
-    public ResponseEntity<Korisnik> izmeniProfil(@PathVariable Long korisnikId,@RequestBody Korisnik korisnik) {
+    public ResponseEntity<Korisnik> izmeniProfil(@PathVariable Long korisnikId,@RequestBody KorisnikDTO korisnik) {
         Korisnik izmenjen=korisnikService.izmeniKorisnika(korisnikId,korisnik);
-        if(izmenjen!=null){
+        if(izmenjen==null){
             return ResponseEntity.notFound().build();
         }
 
@@ -55,4 +62,6 @@ public class KorisnikController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+
 }
