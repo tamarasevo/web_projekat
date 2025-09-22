@@ -18,15 +18,6 @@ public class NovcanikDto {
     private boolean stedni;
    // private Long korisnikID;
 
-    //setter ne radi pa pravimo nas
-    public void setStedni(boolean stedni){
-        this.stedni = stedni;
-    }
-
-    //getter jer ne radi pa pravimo nas
-    public boolean isStedni(){
-        return this.stedni;
-    }
 }
 
 

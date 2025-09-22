@@ -17,28 +17,53 @@ public class ValutaService {
         this.valutaRepository = valutaRepository;
     }
 
-    private final RestTemplate restTemplate = new RestTemplate();
 
     public BigDecimal konvertuj(String from, String to, BigDecimal amount) {
-        String url = String.format(
-                "https://api.frankfurter.dev/v1/latest?base=%s&symbols=%s",
-                from, to
-        );
 
-        // API vraća JSON u obliku { "rates": { "USD": 1.07 } ... }
-        Map<String, Object> response =restTemplate.getForObject(url, Map.class);
-
-        if (response != null && response.containsKey("rates")) {
-            Map<String, Double> rates = (Map<String, Double>) response.get("rates");
-            Double rate = rates.get(to);
-
-            if (rate != null) {
-                return amount.multiply(BigDecimal.valueOf(rate));
-            }
+        if (from.equalsIgnoreCase(to)) {
+            return amount; // nema konverzije
         }
 
-        throw new RuntimeException("Konverzija nije uspela!");
+        // uzimamo "vrednost" valute u odnosu na RSD
+        Valuta iz = getValuta(from);
+        Valuta u = getValuta(to);
+
+        if (iz == null || u == null) {
+            throw new RuntimeException("Nepoznata valuta");
+        }
+
+        BigDecimal iznosURSD = amount.multiply(iz.getVrednost());
+
+
+        BigDecimal konvertovan = iznosURSD.divide(u.getVrednost(), 2, RoundingMode.HALF_UP);
+
+        return konvertovan;
     }
+
+    public Valuta getValuta(String nazivValute) {
+        Valuta valuta = new Valuta();
+
+        switch (nazivValute.toUpperCase()) {
+            case "RSD":
+                valuta.setNaziv("RSD");
+                valuta.setVrednost(BigDecimal.ONE);
+                break;
+            case "EUR":
+                valuta.setNaziv("EUR");
+                valuta.setVrednost(new BigDecimal("117.25"));
+                break;
+            case "USD":
+                valuta.setNaziv("USD");
+                valuta.setVrednost(new BigDecimal("109.50"));
+                break;
+            default:
+                throw new IllegalArgumentException("Nepoznata valuta: " + nazivValute);
+        }
+
+        return valuta;
+    }
+
+
     //logika konverzije
     //videti kako dodati onu funckionalost sa apijem
    /* public BigDecimal konvertuj(BigDecimal iznos, String izValute, String uValutu){

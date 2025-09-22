@@ -2,6 +2,7 @@ package rs.ftn.aplikacija.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rs.ftn.aplikacija.dto.KategorijaDTO;
 import rs.ftn.aplikacija.entity.klase.Kategorija;
 import rs.ftn.aplikacija.entity.klase.Korisnik;
 import rs.ftn.aplikacija.entity.klase.enums.Tip;
@@ -62,14 +63,20 @@ public class KategorijaService {
     }
 
     //dodavanje kategorije
-    public Kategorija dodajKategoriju(Kategorija kategorija,Long korisnikId){
-        Korisnik korisnik=korisnikRepository.findById(korisnikId).orElse(null);
-        if(korisnik==null){
-            return null;
-        }
-        kategorija.setKorisnik(korisnik);
-        kategorija.setPredefinisan(false);
-        return kategorijaRepository.save(kategorija);
+    public Kategorija dodajKategoriju(KategorijaDTO kategorija, Long korisnikId){
+        Korisnik korisnik = korisnikRepository.findById(korisnikId)
+                .orElseThrow(() -> new RuntimeException("Korisnik nije pronađen"));
+
+        // kreiranje entiteta Kategorija iz DTO
+        Kategorija nova = new Kategorija();
+        nova.setNaziv(kategorija.getNaziv());
+        nova.setTip(kategorija.getTip());
+        nova.setPredefinisan(false); // sve korisničke kategorije nisu predefinisane
+        nova.setKorisnik(korisnik);
+
+        // čuvanje u bazi
+        kategorijaRepository.save(nova);
+        return nova;
 
     }
 

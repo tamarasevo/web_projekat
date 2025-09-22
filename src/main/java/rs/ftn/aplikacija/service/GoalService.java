@@ -2,6 +2,7 @@ package rs.ftn.aplikacija.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import rs.ftn.aplikacija.dto.TransakcijaDto;
 import rs.ftn.aplikacija.entity.klase.Goal;
 import rs.ftn.aplikacija.entity.klase.Novcanik;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @Service
 public class GoalService {
     private final NovcanikService novcanikService;
+    private final TransakcijaService transakcijaService;
 
     //dodati cilj u neki novcanik da li vec postojeci ili
     //napravimo novi
@@ -23,9 +25,10 @@ public class GoalService {
 
     private GoalRepository goalRepository;
 
-    public GoalService(GoalRepository goalRepository, NovcanikService novcanikService) {
+    public GoalService(GoalRepository goalRepository, NovcanikService novcanikService, TransakcijaService transakcijaService) {
         this.goalRepository = goalRepository;
         this.novcanikService = novcanikService;
+        this.transakcijaService = transakcijaService;
     }
 
     public Goal save(Goal g) {
@@ -54,6 +57,7 @@ public class GoalService {
 
         Goal cilj=new Goal();
         cilj.setNaziv(naziv);
+        cilj.setTrenutnoStanje(novcanik.getTrenutnoStanje());
         cilj.setCiljIznos(iznos);
         cilj.setKrajnjiRok(krajnjiRok);
         cilj.setNovcanik(novcanik);
@@ -66,15 +70,16 @@ public class GoalService {
     //videti da li treba opcija da se iz drugih novcaika vrsi
     //prenos na goal klasu
     @Transactional
-    public void azurirajGoal(Transakcija transakcija){
+    public void azurirajGoal(Long izvorni,Long ciljni, TransakcijaDto transakcija){
         //nadji novcanik kome pripada transakcija
-        Novcanik novcanik=transakcija.getNovcanik();
+        Novcanik novcanik=novcanikService.getById(izvorni);
 
         if(novcanik.getTrenutnoStanje().compareTo(transakcija.getIznos())<0){
             throw new RuntimeException("Nema dovoljno sredstava na racunu!");
         }
 
-        Goal cilj=goalRepository.findByNovcanik(novcanik);
+        Novcanik ciljani=novcanikService.getById(ciljni);
+        Goal cilj=goalRepository.findByNovcanik(ciljani);
         if(cilj==null){
             throw new RuntimeException("Nema aktivnih ciljeva!");
         }
@@ -98,6 +103,7 @@ public class GoalService {
         if(ostatak.compareTo(BigDecimal.ZERO)>0){
             novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().add(ostatak));
         }
+        novcanikService.save(ciljani);
         novcanikService.save(novcanik);
     }
 

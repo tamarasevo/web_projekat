@@ -1,19 +1,29 @@
 package rs.ftn.aplikacija.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rs.ftn.aplikacija.dto.NovcanikDto;
 import rs.ftn.aplikacija.entity.klase.Korisnik;
 import rs.ftn.aplikacija.entity.klase.Novcanik;
+import rs.ftn.aplikacija.entity.klase.Valuta;
 import rs.ftn.aplikacija.repository.NovcanikRepository;
+import rs.ftn.aplikacija.repository.ValutaRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class NovcanikService {
 
     private final NovcanikRepository novcanikRepository;
     private final KorisnikService korisnikService;
+    @Autowired
+    private ValutaRepository valutaRepository;
+   /* @Autowired
+    private FrankfurtApiService FAS ;*/
+    @Autowired
+    private ValutaService valutaService;
 
     public NovcanikService(NovcanikRepository novcanikRepository, KorisnikService korisnikService) {
         this.novcanikRepository = novcanikRepository;
@@ -21,7 +31,8 @@ public class NovcanikService {
     }
 
     public Novcanik getById(Long id){
-        return novcanikRepository.findById(id).orElse(null);
+        return novcanikRepository.findById(id).orElseThrow(() -> new RuntimeException("Novcanik sa id " + id + " ne postoji"));
+
     }
 
     public Novcanik save(Novcanik novcanik){
@@ -46,15 +57,20 @@ public class NovcanikService {
         return true;
     }
 
-    public Novcanik dodajNovcanik(NovcanikDto novcanik){
-        Korisnik korisnik=korisnikService.getKorisnika(novcanik.getKorisnikID());
+    public Novcanik dodajNovcanik(NovcanikDto novcanik, Long id){
+        Korisnik korisnik=korisnikService.getKorisnika(id);
         if(korisnik==null){
             throw new IllegalStateException("Korisnik ne postoji korisnika!");
         }
+        Valuta valuta = valutaService.getValuta(novcanik.getValuta());
+
         Novcanik novi=new Novcanik();
         novi.setNaziv(novcanik.getNaziv());
         novi.setKorisnik(korisnik);
         novi.setPocetnoStanje(novcanik.getPocetnoStanje());
+        novi.setTrenutnoStanje(novcanik.getPocetnoStanje());
+        novi.setStedni(novcanik.isStedni());
+        novi.setValuta(valuta);
         novcanikRepository.save(novi);
         return novi;
     }
@@ -68,7 +84,18 @@ public class NovcanikService {
         BigDecimal suma=new BigDecimal(0);
 
         for(Novcanik n:novcanici){
-            suma=suma.add(n.getTrenutnoStanje());
+            if(n.isArhiviran()){
+                continue;
+            }
+
+            BigDecimal stanje= n.getTrenutnoStanje();
+            String valuta = n.getValuta().getNaziv();
+
+            // konvertuj u RSD samo ako nije dinar
+            if (!"RSD".equalsIgnoreCase(valuta)) {
+                stanje = valutaService.konvertuj(valuta, "RSD", stanje);
+            }
+            suma=suma.add(stanje);
         }
         return suma;
     }
@@ -80,8 +107,8 @@ public class NovcanikService {
         }
 
         novcanik1.setNaziv(novcanik.getNaziv());
-        //novcanik1.setTrenutnoStanje(novcanik.getPocetnoStanje());
-        novcanik1.setPocetnoStanje(novcanik.getPocetnoStanje());
+        novcanik1.setTrenutnoStanje(novcanik.getPocetnoStanje());
+        //novcanik1.setPocetnoStanje(novcanik.getPocetnoStanje());
         novcanik1.setStedni(novcanik.isStedni());
         novcanik1.setStedni(novcanik.isStedni());
 

@@ -36,6 +36,8 @@ public class Korisnik {
     private LocalDate datumRegistracije;
     private boolean blokiran;
 
+    private LocalDate datumPoslednjegLogovanja;
+
     private String valuta;
 
 
@@ -52,12 +54,15 @@ public class Korisnik {
     private Set<Novcanik> novcanici= new HashSet<>();
 
     @OneToMany(mappedBy="korisnik")
+    @JsonManagedReference
     private Set<Transakcija> transakcije=new HashSet<>();
 
     @OneToMany(mappedBy="korisnik")
+    @JsonManagedReference
     private Set<Kategorija> kategorija=new HashSet<>();
 
     @OneToMany(mappedBy="korisnik")
+    @JsonManagedReference
     private Set<Goal> stednja=new HashSet<>();
 
 

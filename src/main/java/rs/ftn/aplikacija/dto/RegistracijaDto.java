@@ -23,6 +23,6 @@ public class RegistracijaDto {
     private String uloga;
 
     //opciona polja
-    private String valuta;
-    private String slika;
+    //private String valuta;
+    //private String slika;
 }
