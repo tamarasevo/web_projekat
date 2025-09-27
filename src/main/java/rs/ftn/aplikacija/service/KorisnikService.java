@@ -3,17 +3,14 @@ package rs.ftn.aplikacija.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import rs.ftn.aplikacija.dto.KorisnikDTO;
 import rs.ftn.aplikacija.dto.RegistracijaDto;
 import rs.ftn.aplikacija.entity.klase.Kategorija;
 import rs.ftn.aplikacija.entity.klase.Korisnik;
-import rs.ftn.aplikacija.entity.klase.Transakcija;
 import rs.ftn.aplikacija.entity.klase.Valuta;
 import rs.ftn.aplikacija.entity.klase.enums.Tip;
 import rs.ftn.aplikacija.entity.klase.enums.Uloga;
 import rs.ftn.aplikacija.repository.KategorijaRepository;
 import rs.ftn.aplikacija.repository.KorisnikRepository;
-import rs.ftn.aplikacija.repository.TransakcijaRepository;
 import rs.ftn.aplikacija.repository.ValutaRepository;
 
 import java.time.LocalDate;
@@ -48,13 +45,9 @@ public class KorisnikService {
         return korisnikRepository.findById(id).orElse(null);
     }
 
-    public Korisnik getKorisnickoIme(String ime){
-        return korisnikRepository.findByKorisnickoIme(ime).orElseThrow(() -> new RuntimeException("Korisnik nije pronađen"));
-    }
-
     //izmena licnih podataka
     //azuriranje
-    public Korisnik izmeniKorisnika(Long id, KorisnikDTO pocetni){
+    public Korisnik izmeniKorisnika(Long id,Korisnik pocetni){
         Korisnik  korisnik=korisnikRepository.findById(id).orElse(null);
         if(korisnik==null){
             return null;
@@ -69,14 +62,14 @@ public class KorisnikService {
         if(pocetni.getPrezime()!=null){
             korisnik.setPrezime(pocetni.getPrezime());
         }
-       /* if(pocetni.getMejl()!=null){
+        if(pocetni.getMejl()!=null){
             korisnik.setMejl(pocetni.getMejl());
-        }*/
-        if(pocetni.getLozinka()!=null){
-            korisnik.setLozinkaHash(pocetni.getLozinka());
         }
-        if(pocetni.getSlika()!=null){
-            korisnik.setProfilnaSlika(pocetni.getSlika());
+        if(pocetni.getLozinkaHash()!=null){
+            korisnik.setLozinkaHash(pocetni.getLozinkaHash());
+        }
+        if(pocetni.getProfilnaSlika()!=null){
+            korisnik.setProfilnaSlika(pocetni.getProfilnaSlika());
         }
         if(pocetni.getDatumRodjenja()!=null){
             korisnik.setDatumRodjenja(pocetni.getDatumRodjenja());
@@ -96,8 +89,8 @@ public class KorisnikService {
         korisnik.setMejl(korisnikDTO.getEmail());
         korisnik.setLozinkaHash(passwordEncoder.encode(korisnikDTO.getLozinka()));
         korisnik.setDatumRodjenja(korisnikDTO.getDatumRodjenja());
-        korisnik.setUloga(Uloga.valueOf(korisnikDTO.getUloga())); // default uloga
-     //   korisnik.setValuta(korisnikDTO.getValuta());
+        korisnik.setUloga(Uloga.KORISNIK); // default uloga
+        korisnik.setValuta(korisnikDTO.getValuta());
         korisnik.setDatumRegistracije(LocalDate.now());
         korisnik.setBlokiran(false);
 
@@ -117,7 +110,7 @@ public class KorisnikService {
     }
 
     public Korisnik login(String korisnickoIme,String lozinka){
-        Korisnik korisnik=korisnikRepository.findByKorisnickoIme(korisnickoIme).orElseThrow(() -> new RuntimeException("Korisnik nije pronađen"));
+        Korisnik korisnik=korisnikRepository.findByKorisnickoIme(korisnickoIme);
         if(korisnik==null){
             throw new RuntimeException("Nepoznat korisnik.");
         }
@@ -130,10 +123,4 @@ public class KorisnikService {
 
         return korisnik;
     }
-
-
-
-
-
-
 }
