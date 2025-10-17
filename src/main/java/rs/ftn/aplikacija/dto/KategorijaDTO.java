@@ -13,4 +13,6 @@ import rs.ftn.aplikacija.entity.klase.enums.Tip;
 public class KategorijaDTO {
     private String naziv;
     private Tip tip;
+    private boolean aktivna=true;
+
 }

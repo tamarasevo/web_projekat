@@ -15,9 +15,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GoalDto{
+    private Long novcanikId;
     private String naziv;
     private BigDecimal iznos;
     private LocalDate krajnjiCilj;
-    private Long novcanikId;
+   // private Long novcanikId;
 
 }

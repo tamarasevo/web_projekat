@@ -21,8 +21,5 @@ public class RegistracijaDto {
     private String lozinka;
     private LocalDate datumRodjenja;
     private String uloga;
-
-    //opciona polja
-    //private String valuta;
-    //private String slika;
+    private String slika;
 }

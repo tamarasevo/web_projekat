@@ -29,7 +29,7 @@ public class Kategorija {
     private Tip tip;
 
     private boolean predefinisan; // da li je podrazumevana ili mora rucno od svakog korisnika
-
+    private boolean aktivna;
 
     //veza sa transakcijama
     @OneToMany(mappedBy="kategorije", cascade = CascadeType.ALL)

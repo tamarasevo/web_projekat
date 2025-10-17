@@ -25,4 +25,5 @@ public class KorisnikDTO {
     //opciona polja
    // private String valuta;
     private String slika;
+
 }

@@ -63,5 +63,13 @@ public class KorisnikController {
         }
     }
 
+    @GetMapping("/svi")
+    public ResponseEntity<List<Korisnik>> sviKorisnici() {
+        List<Korisnik> lista = korisnikService.findAll(); // mora da postoji u servisu
+        return ResponseEntity.ok(lista);
+    }
+
+
+
 
 }

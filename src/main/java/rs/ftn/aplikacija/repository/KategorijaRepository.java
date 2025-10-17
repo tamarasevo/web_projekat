@@ -12,4 +12,6 @@ public interface KategorijaRepository extends JpaRepository<Kategorija, Long> {
     List<Kategorija> findByKorisnikId(long korisnikId);
     List<Kategorija> findByPredefinisanTrue();
 
+    long countByPredefinisanTrue();
+
 }

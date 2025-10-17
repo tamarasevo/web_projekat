@@ -30,10 +30,18 @@ public class NovcanikService {
         this.korisnikService = korisnikService;
     }
 
-    public Novcanik getById(Long id){
+    /*public Novcanik getById(Long id){
         return novcanikRepository.findById(id).orElseThrow(() -> new RuntimeException("Novcanik sa id " + id + " ne postoji"));
 
+    }*/
+    public Novcanik getById(Long id) {
+        return novcanikRepository.findById(id).orElse(null);
     }
+
+    public List<Novcanik> getNovcaniciKorisnika(Long id) {
+        return novcanikRepository.findByKorisnikId(id);
+    }
+
 
     public Novcanik save(Novcanik novcanik){
         return novcanikRepository.save(novcanik);

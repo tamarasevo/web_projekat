@@ -1,116 +1,146 @@
 package rs.ftn.aplikacija.controller;
 
-import jakarta.persistence.Id;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rs.ftn.aplikacija.config.JwtUtil;
 import rs.ftn.aplikacija.dto.NovcanikDto;
 import rs.ftn.aplikacija.dto.TransakcijaDto;
 import rs.ftn.aplikacija.entity.klase.Korisnik;
 import rs.ftn.aplikacija.entity.klase.Novcanik;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
-import rs.ftn.aplikacija.repository.KorisnikRepository;
 import rs.ftn.aplikacija.service.KorisnikService;
 import rs.ftn.aplikacija.service.NovcanikService;
 import rs.ftn.aplikacija.service.TransakcijaService;
 
-
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/novcanici")
 public class NovcanikController {
 
     private final NovcanikService novcanikService;
+    private final KorisnikService korisnikService;
+    private final TransakcijaService transakcijaService;
 
     @Autowired
-    private KorisnikService korisnikService;
-
-    @Autowired
-    private TransakcijaService transakcijaService;
-
-    public NovcanikController(NovcanikService novcanikService) {
-        this.novcanikService =novcanikService;
+    public NovcanikController(NovcanikService novcanikService,
+                              KorisnikService korisnikService,
+                              TransakcijaService transakcijaService) {
+        this.novcanikService = novcanikService;
+        this.korisnikService = korisnikService;
+        this.transakcijaService = transakcijaService;
     }
 
-    //dodavanje novcanika
-    @PostMapping("{id}/dodaj")
-    public ResponseEntity<Novcanik> dodajNovcanik(@RequestBody NovcanikDto novcanik,@PathVariable Long id) {
+    // Dodavanje novčanika za ulogovanog korisnika
+    @PostMapping("/dodaj")
+    public ResponseEntity<Novcanik> dodajNovcanik(
+            @RequestBody NovcanikDto novcanikDto,
+            @CookieValue(value = "token", required = false) String token) {
 
-            Novcanik sacuvan = novcanikService.dodajNovcanik(novcanik,id);
-            return ResponseEntity.ok(sacuvan);
+        if (token == null || token.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
 
+        Long korisnikId = JwtUtil.getKorisnikId(token);
+        if (korisnikId == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        Novcanik novcanik = novcanikService.dodajNovcanik(novcanikDto, korisnikId);
+        return ResponseEntity.ok(novcanik);
     }
 
-    //Azuriranje novcanika
-    @PutMapping("/{id}")
-    public ResponseEntity<Novcanik> izmeniNovcanik(
-            @PathVariable Long id,
-            @RequestBody NovcanikDto novcanikDto) {
+    // Dobavljanje svih novčanika ulogovanog korisnika
+    @GetMapping("/ulogovan")
+    public ResponseEntity<List<Novcanik>> getNovcaniciUlogovanog(
+            @CookieValue(value = "token", required = false) String token) {
 
-        Novcanik izmenjen = novcanikService.azurirajNovcanik(id, novcanikDto);
+        if (token == null || token.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
 
+        Long korisnikId = JwtUtil.getKorisnikId(token);
+        if (korisnikId == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        List<Novcanik> novcanici = novcanikService.getNovcaniciKorisnika(korisnikId);
+        return ResponseEntity.ok(novcanici);
+    }
+
+    // Ažuriranje novčanika
+    @PutMapping("/azuriraj")
+    public ResponseEntity<Novcanik> azurirajNovcanik(@RequestBody NovcanikDto novcanikDto) {
+        Novcanik izmenjen = novcanikService.azurirajNovcanik(novcanikDto.getNovcanikId(), novcanikDto);
         if (izmenjen == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(izmenjen);
     }
 
-
-    //Brisanje novcanika
+    // Brisanje novčanika
     @DeleteMapping("/obrisi/{id}")
-    public ResponseEntity<Novcanik> obrisiNovcanik(@PathVariable Long id){
-        Novcanik novcanik=novcanikService.getById(id);
-        if(novcanik==null)
+    public ResponseEntity<Void> obrisiNovcanik(@PathVariable Long id) {
+        Novcanik novcanik = novcanikService.getById(id);
+        if (novcanik == null) {
             return ResponseEntity.notFound().build();
-
+        }
         novcanikService.delete(novcanik);
-
-        //vracamo informaciju o tome da li je obrisano ili ne
-        //ne koirstimo ok jer ce nam on vratiti informacije
-        //o novcaniku
         return ResponseEntity.noContent().build();
     }
 
-    //pregled transakcija po novcaniku
+    // Pregled transakcija po novčaniku
     @GetMapping("/{novcanikId}/transakcije")
-    public ResponseEntity<List<TransakcijaDto>> pregledTransakcija(@PathVariable Long novcanikId){
-        List<Transakcija> transakcije=transakcijaService.getTransakcije(novcanikId);
-        if(transakcije.isEmpty())
+    public ResponseEntity<List<TransakcijaDto>> pregledTransakcija(@PathVariable Long novcanikId) {
+        List<Transakcija> transakcije = transakcijaService.getTransakcije(novcanikId);
+        if (transakcije.isEmpty()) {
             return ResponseEntity.noContent().build();
+        }
         List<TransakcijaDto> dtoList = transakcije.stream()
                 .map(TransakcijaDto::new)
-                .toList();
-
+                .collect(Collectors.toList());
         return ResponseEntity.ok(dtoList);
     }
 
-    //ovde samo pozivamao metodu za arhiviranje ne moze ovde menjati
-    //contorller samo prima i prosledjuje zahteve servisu
-    //ne treba nam dodatna logika tu
+    // Arhiviranje novčanika
     @PutMapping("/{novcanikId}/arhiviran")
-    public ResponseEntity<Boolean> arhivirajNovcanik(@PathVariable Long novcanikId){
-        Boolean uspesno=novcanikService.arhiviraj(novcanikId);
-        if(uspesno==false)
+    public ResponseEntity<Boolean> arhivirajNovcanik(@PathVariable Long novcanikId) {
+        boolean uspesno = novcanikService.arhiviraj(novcanikId);
+        if (!uspesno) {
             return ResponseEntity.notFound().build();
-
+        }
         return ResponseEntity.ok(true);
     }
 
-    //dobavlja stanje novcanika
+    // Dobavljanje stanja novčanika
     @GetMapping("/{novcanikId}/stanje")
-    public ResponseEntity<BigDecimal> stanjeNovcanika(@PathVariable Long novcanikId){
-        BigDecimal stanje=novcanikService.getStanjeNovcanika(novcanikId);
-        if(stanje==null)
+    public ResponseEntity<BigDecimal> stanjeNovcanika(@PathVariable Long novcanikId) {
+        BigDecimal stanje = novcanikService.getStanjeNovcanika(novcanikId);
+        if (stanje == null) {
             return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(stanje);
     }
 
-    //ukupno stanje
-    @GetMapping("/korisnik/{korisnikId}")
-    public ResponseEntity<BigDecimal> getUkupnoStanje(@PathVariable Long korisnikId){
-        BigDecimal ukupno=novcanikService.getUkupnoStanjeKorisnika(korisnikId);
+    // Ukupno stanje svih novčanika ulogovanog korisnika
+    @GetMapping("/ulogovan/stanje")
+    public ResponseEntity<BigDecimal> ukupnoStanjeUlogovanog(
+            @CookieValue(value = "token", required = false) String token) {
+
+        if (token == null || token.isEmpty()) {
+            return ResponseEntity.status(401).build();
+        }
+
+        Long korisnikId = JwtUtil.getKorisnikId(token);
+        if (korisnikId == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        BigDecimal ukupno = novcanikService.getUkupnoStanjeKorisnika(korisnikId);
         return ResponseEntity.ok(ukupno);
     }
 }
+

@@ -81,7 +81,7 @@ public class KategorijaService {
     }
 
     //za admina dodavanje predefinisanih
-    public Kategorija dodajPredefinisanKategoriju(String naziv, Tip tip){
+    public Kategorija dodajPredefinisanKategoriju(String naziv, Tip tip,boolean aktivna){
         Kategorija kategorija=new Kategorija();
         kategorija.setNaziv(naziv);
         kategorija.setTip(tip);
@@ -90,5 +90,13 @@ public class KategorijaService {
         kategorija.setKorisnik(null);
         return kategorijaRepository.save(kategorija);
     }
+
+    public Kategorija deaktivirajGlobalnuKategoriju(Long id) {
+        Kategorija k = kategorijaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Kategorija ne postoji"));
+        k.setAktivna(false); // samo deaktivira
+        return kategorijaRepository.save(k);
+    }
+
 
 }

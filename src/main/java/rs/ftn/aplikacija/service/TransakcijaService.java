@@ -13,6 +13,7 @@ import rs.ftn.aplikacija.entity.klase.Novcanik;
 import rs.ftn.aplikacija.entity.klase.Transakcija;
 import rs.ftn.aplikacija.entity.klase.enums.Tip;
 import rs.ftn.aplikacija.entity.klase.enums.Ucestalost;
+import rs.ftn.aplikacija.repository.KategorijaRepository;
 import rs.ftn.aplikacija.repository.TransakcijaRepository;
 import rs.ftn.aplikacija.entity.klase.Transfer;
 
@@ -31,6 +32,8 @@ public class TransakcijaService {
     private NovcanikService novcanikService;
     @Autowired
     private ValutaService valutaService;
+    @Autowired
+    private KategorijaRepository kategorijaRepository;
 
     public TransakcijaService(TransakcijaRepository transakcijaRepository) {
         this.transakcijaRepository = transakcijaRepository;
@@ -107,12 +110,10 @@ public class TransakcijaService {
                     trebaGenerisati=t.getDatumTransakcije().plusYears(1).isEqual(danas) || t.getDatumTransakcije().plusYears(1).isEqual(danas);
                     break;
             }
-
             if(trebaGenerisati){
              Transakcija nova=new Transakcija();
              nova.setDatumTransakcije(danas);
              transakcijaRepository.save(nova);
-
             }
 
         }
@@ -166,14 +167,10 @@ public class TransakcijaService {
           throw new RuntimeException("Novcanik nije pronadjenn");
         }
 
-        //povezi transakcija sa novcanikom i povezi sa korisnikom
-       // transakcija.setNovcanik(novcanik);
+       Kategorija kategorija = kategorijaRepository.findById(transakcija.getKategorijaId())
+               .orElseThrow(() -> new RuntimeException("Kategorija ne postoji"));
 
-        //trebamo da stavimo transakciju sa korisiko kome pripada novcanik
-        //transakcija.setKorisnik(novcanik.getKorisnik());
-
-
-        //cuvamo transakciju
+       //cuvamo transakciju
         Transakcija sacuvana=new Transakcija();
         //Novcanik n=novcanikService.getById(transakcija.getNovcanikId());
         sacuvana.setNovcanik(novcanik);
@@ -181,9 +178,11 @@ public class TransakcijaService {
         sacuvana.setIznos(transakcija.getIznos());
         sacuvana.setTip(transakcija.getTip());
         sacuvana.setPonavljajuca(transakcija.isPonavljajuca());
-        sacuvana.setDatumTransakcije(LocalDate.now());
+        sacuvana.setDatumTransakcije(transakcija.getDatum());
         sacuvana.setNaziv(transakcija.getNaziv());
-        //System.out.println("Pre update-a: " + novcanik.getTrenutnoStanje());
+        sacuvana.setKategorije(kategorija);
+
+       //System.out.println("Pre update-a: " + novcanik.getTrenutnoStanje());
         if(sacuvana.getTip()== Tip.PRIHOD){
             novcanik.setTrenutnoStanje(novcanik.getTrenutnoStanje().add(sacuvana.getIznos()));
         }else if(sacuvana.getTip()==Tip.TROSAK) {
@@ -196,7 +195,8 @@ public class TransakcijaService {
        transakcijaRepository.save(sacuvana);
         novcanikService.save(novcanik);
         return  sacuvana;
-    }
+        }
+
 
     //za pregled transakcije, po danu
     public List<Object[]> pregledDnevnihTransakcija(Long korisnikId){

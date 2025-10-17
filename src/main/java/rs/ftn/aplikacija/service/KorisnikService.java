@@ -3,6 +3,7 @@ package rs.ftn.aplikacija.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import rs.ftn.aplikacija.dto.KorisnikDTO;
 import rs.ftn.aplikacija.dto.RegistracijaDto;
 import rs.ftn.aplikacija.entity.klase.Kategorija;
 import rs.ftn.aplikacija.entity.klase.Korisnik;
@@ -47,7 +48,7 @@ public class KorisnikService {
 
     //izmena licnih podataka
     //azuriranje
-    public Korisnik izmeniKorisnika(Long id,Korisnik pocetni){
+    public Korisnik izmeniKorisnika(Long id, KorisnikDTO pocetni){
         Korisnik  korisnik=korisnikRepository.findById(id).orElse(null);
         if(korisnik==null){
             return null;
@@ -62,14 +63,14 @@ public class KorisnikService {
         if(pocetni.getPrezime()!=null){
             korisnik.setPrezime(pocetni.getPrezime());
         }
-        if(pocetni.getMejl()!=null){
-            korisnik.setMejl(pocetni.getMejl());
+        if(pocetni.getEmail()!=null){
+            korisnik.setMejl(pocetni.getEmail());
         }
-        if(pocetni.getLozinkaHash()!=null){
-            korisnik.setLozinkaHash(pocetni.getLozinkaHash());
+        if(pocetni.getLozinka()!=null){
+            korisnik.setLozinkaHash(pocetni.getLozinka());
         }
-        if(pocetni.getProfilnaSlika()!=null){
-            korisnik.setProfilnaSlika(pocetni.getProfilnaSlika());
+        if(pocetni.getSlika()!=null){
+            korisnik.setProfilnaSlika(pocetni.getSlika());
         }
         if(pocetni.getDatumRodjenja()!=null){
             korisnik.setDatumRodjenja(pocetni.getDatumRodjenja());
@@ -90,24 +91,24 @@ public class KorisnikService {
         korisnik.setLozinkaHash(passwordEncoder.encode(korisnikDTO.getLozinka()));
         korisnik.setDatumRodjenja(korisnikDTO.getDatumRodjenja());
         korisnik.setUloga(Uloga.KORISNIK); // default uloga
-        korisnik.setValuta(korisnikDTO.getValuta());
+        //korisnik.setValuta(korisnikDTO.getValuta());
         korisnik.setDatumRegistracije(LocalDate.now());
         korisnik.setBlokiran(false);
 
-        Korisnik sacuvan = korisnikRepository.save(korisnik);
-        List<Kategorija> kategorijePredefinisane= List.of(
-                new Kategorija("Hrana", Tip.TROSAK,true,sacuvan),
-                new Kategorija("Domacinstvo",Tip.TROSAK,true,sacuvan),
-                new Kategorija("Zabava",Tip.TROSAK,true,sacuvan),
-                new Kategorija("Investicije",Tip.TROSAK,true,sacuvan));
-
-        //snimimo sve predefinisane u bazu
-        for(Kategorija k:kategorijePredefinisane){
-            kategorijaRepository.save(k);
+        if (korisnikDTO.getSlika() != null && !korisnikDTO.getSlika().isEmpty()) {
+            korisnik.setProfilnaSlika(korisnikDTO.getSlika()); // uzima putanju sa frontenda
+        } else {
+            korisnik.setProfilnaSlika("/images/default.png"); // default ikonica
         }
+
+        Korisnik sacuvan = korisnikRepository.save(korisnik);
 
         return sacuvan;
     }
+    public Korisnik findByKorisnickoIme(String korisnickoIme) {
+        return korisnikRepository.findByKorisnickoIme(korisnickoIme);
+    }
+
 
     public Korisnik login(String korisnickoIme,String lozinka){
         Korisnik korisnik=korisnikRepository.findByKorisnickoIme(korisnickoIme);
@@ -123,4 +124,11 @@ public class KorisnikService {
 
         return korisnik;
     }
+    public Korisnik getKorisnickoIme (String korisnickoIme){
+        return korisnikRepository.findByKorisnickoIme(korisnickoIme);
+    }
+    public List<Korisnik> findAll() {
+        return korisnikRepository.findAll();
+    }
+
 }

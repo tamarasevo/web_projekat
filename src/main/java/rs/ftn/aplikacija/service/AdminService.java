@@ -79,7 +79,7 @@ public class AdminService {
     }
 
     public Kategorija dodajPredefinisanu(KategorijaDTO kategorija){
-        Kategorija nova=kategorijaService.dodajPredefinisanKategoriju(kategorija.getNaziv(),kategorija.getTip());
+        Kategorija nova=kategorijaService.dodajPredefinisanKategoriju(kategorija.getNaziv(),kategorija.getTip(),kategorija.isAktivna());
         return nova;
     }
 

@@ -39,13 +39,13 @@ public class TransakcijaController {
     private KorisnikService korisnikService;
 
     //dodaj transakciju(iznos,tip,datum,kategorija)
-    @PostMapping("{novcanikId}/dodaj")
-    public ResponseEntity<Transakcija> dodajTransakcija(@RequestBody TransakcijaDto transakcija,@PathVariable Long novcanikId) {
+    @PostMapping("/dodaj")
+    public ResponseEntity<Transakcija> dodajTransakcija(@RequestBody TransakcijaDto transakcija) {
 
         //prvo nadjemo novcanik kome pripada tarnsakcija
 
            // transakcijaDto.setNovcanikId(novcanikId); // osiguravamo da DTO ima novcanikId
-            Transakcija sacuvana = transakcijaService.dodajTransakcije(transakcija,novcanikId);
+            Transakcija sacuvana = transakcijaService.dodajTransakcije(transakcija,transakcija.getNovcanikId());
             return ResponseEntity.ok(sacuvana);
     }
 
@@ -74,11 +74,11 @@ public class TransakcijaController {
     }
 
     //transfer izmedju dva novcanika
-    @PostMapping("/transfer/{id1}/{id2}")
-    public ResponseEntity<String> transfer(@RequestBody TransferDTO transfer,@PathVariable Long id1,@PathVariable Long id2) {
+    @PostMapping("/transfer")
+    public ResponseEntity<String> transfer(@RequestBody TransferDTO transfer) {
 
         System.out.println("Transfer"+transfer);
-        transakcijaService.transferIzmedjuNovcanika(id1, id2, transfer.getIznos());
+        transakcijaService.transferIzmedjuNovcanika(transfer.getIzNovcanika(), transfer.getAsd(), transfer.getIznos());
             return ResponseEntity.ok("Transfer uspešno izvršen");
 
     }

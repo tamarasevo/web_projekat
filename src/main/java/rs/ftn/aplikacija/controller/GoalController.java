@@ -22,9 +22,9 @@ public class GoalController {
         this.goalService = goalService;
     }
 
-    @PostMapping("/dodaj/{novcanikId}")
-    public ResponseEntity<?> dodajGoal(@RequestBody GoalDto goalDto,@PathVariable Long novcanikId) {
-        Goal cilj=goalService.dodajGoal(goalDto.getNaziv(),goalDto.getIznos(),goalDto.getKrajnjiCilj(),novcanikId);
+    @PostMapping("/dodaj")
+    public ResponseEntity<?> dodajGoal(@RequestBody GoalDto goalDto) {
+        Goal cilj=goalService.dodajGoal(goalDto.getNaziv(),goalDto.getIznos(),goalDto.getKrajnjiCilj(),goalDto.getNovcanikId());
 
         if(cilj==null){
             return ResponseEntity.noContent().build();

@@ -1,4 +1,4 @@
-package rs.ftn.aplikacija.entity.klase;
+package rs.ftn.aplikacija.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +10,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@SuppressWarnings("removal")
 public class SecurityConfig{
 
     @Bean
@@ -24,7 +25,9 @@ public class SecurityConfig{
                         .anyRequest().permitAll()      // svi endpoint-i slobodni
                 )
                 .formLogin(form -> form.disable()) // onemogućavamo form login
-                .httpBasic(basic-> basic.disable()); // onemogućavamo basic auth
+                .httpBasic(httpBasic-> httpBasic.disable())
+                .headers(headers -> headers.frameOptions().disable());
+        ; // onemogućavamo basic auth
 
         return http.build();
     }

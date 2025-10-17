@@ -15,7 +15,10 @@ import java.util.Optional;
 //ima u sebi long count() metodu koja nam vraca broj
 //redova u tabeli
 public interface KorisnikRepository extends JpaRepository<Korisnik, Long> {
-    Optional<Korisnik> findByKorisnickoIme(String korisnickoIme);
+    default Korisnik findByKorisnickoIme(String korisnickoIme) {
+        return null;
+    }
+
     @Query("SELECT COUNT(k) FROM Korisnik k WHERE k.datumPoslednjegLogovanja >= :datum")
     Long countAktivnih(@Param("datum") LocalDate datum);
 

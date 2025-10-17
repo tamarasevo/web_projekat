@@ -12,11 +12,11 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class NovcanikDto {
+    private Long novcanikId;
     private String naziv;
     private BigDecimal pocetnoStanje;
     private String valuta;
     private boolean stedni;
-   // private Long korisnikID;
 
 }
 

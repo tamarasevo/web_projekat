@@ -20,7 +20,7 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // Traži korisnika u bazi
         Korisnik korisnik = korisnikRepository.findByKorisnickoIme(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                ;
 
         // Vrati UserDetails koji Spring Security koristi za autentifikaciju
         return User.builder()
